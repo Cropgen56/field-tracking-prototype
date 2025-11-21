@@ -3,19 +3,19 @@ import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, CartesianGrid } fro
 import { useFieldData } from "../context/FieldDataContext";
 
 const defaultData = [
-  { name: "WK 1", v: 0.2 },
-  { name: "WK 2", v: 0.4 },
-  { name: "WK 3", v: 0.32 },
-  { name: "WK 4", v: 0.45 },
-  { name: "WK 5", v: 0.5 },
-  { name: "WK 6", v: 0.7 },
-  { name: "WK 7", v: 0.6 },
-  { name: "WK 8", v: 0.48 },
+  { name: "WK 1", v: 0.15 },
+  { name: "WK 2", v: 0.22 },
+  { name: "WK 3", v: 0.28 },
+  { name: "WK 4", v: 0.25 },
+  { name: "WK 5", v: 0.32 },
+  { name: "WK 6", v: 0.38 },
+  { name: "WK 7", v: 0.35 },
+  { name: "WK 8", v: 0.30 },
 ];
 
-export default function NDVIChart() {
+export default function WaterIndexChart() {
   const { fieldData } = useFieldData();
-  const data = fieldData?.ndviTimeSeries || defaultData;
+  const data = fieldData?.waterIndexTimeSeries || defaultData;
 
   return (
     <ResponsiveContainer width="100%" height="100%">
@@ -27,13 +27,13 @@ export default function NDVIChart() {
           tickLine={false}
           axisLine={false}
         />
-        <YAxis hide domain={[0, 1]} />
+        <YAxis hide domain={[0, 0.5]} />
         <Line
           type="monotone"
           dataKey="v"
-          stroke="#8DD36A"
+          stroke="#3B82F6"
           strokeWidth={2}
-          dot={{ r: 4, fill: "#8DD36A" }}
+          dot={{ r: 4, fill: "#3B82F6" }}
         />
       </LineChart>
     </ResponsiveContainer>

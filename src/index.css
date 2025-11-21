@@ -2,29 +2,18 @@
 
 /* ---- TAILWIND THEME TOKENS ---- */
 @theme {
-  /* Colors that become bg-cg-bg, bg-cg-panel, text-cg-accent, etc. */
-  --color-cg-bg: #132f1eff;
+  --color-cg-bg: #1A3123;
   --color-cg-panel: #0c2214;
   --color-cg-accent: #79c24a;
   --color-cg-muted: #9fb79f;
-
-  /* Shadow that becomes shadow-cg-soft */
   --shadow-cg-soft: 0 18px 40px rgba(0, 0, 0, 0.4);
 }
 
-/* (Optional) keep CSS custom props if you still want them separately */
 :root {
   --color-cg-bg: #132f1eff;
   --color-cg-panel: #0c2214;
   --color-cg-accent: #79c24a;
   --color-cg-muted: #9fb79f;
-}
-
-/* Reset and base styles */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
 }
 
 html {
@@ -45,14 +34,31 @@ body {
   overflow-x: hidden;
 }
 
-/* Prevent horizontal scroll on mobile */
-.container-fluid {
-  width: 100%;
-  padding-right: 15px;
-  padding-left: 15px;
-  margin-right: auto;
-  margin-left: auto;
-  overflow-x: hidden;
+/* Custom scrollbar styling */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(26, 49, 35, 0.5);
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(121, 194, 74, 0.5);
+  border-radius: 10px;
+  transition: background 0.2s;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(121, 194, 74, 0.7);
+}
+
+/* Custom scrollbar for Firefox */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(121, 194, 74, 0.5) rgba(26, 49, 35, 0.5);
 }
 
 /* Hide scrollbar but keep functionality */
@@ -64,6 +70,35 @@ body {
   display: none;
 }
 
+/* Modal Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.2s ease-out;
+}
+
+.animate-slideUp {
+  animation: slideUp 0.3s ease-out;
+}
+
 /* Responsive image handling */
 img {
   max-width: 100%;
@@ -71,7 +106,7 @@ img {
   display: block;
 }
 
-/* Reusable card block – NOW VALID */
+/* Reusable card block */
 .block-card {
   @apply bg-cg-panel rounded-2xl p-4 shadow-cg-soft;
 }

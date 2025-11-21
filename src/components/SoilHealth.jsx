@@ -1,15 +1,24 @@
 import React, { useState } from "react";
 import wheatCrop from "../assets/cropimage.png";
 import SoilHealthChart from "./crophealth/SoilHealthChart";
+import { useFieldData } from "../context/FieldDataContext";
 
 export default function SoilHealth() {
   const [autoDetectCrop, setAutoDetectCrop] = useState(true);
+  const { fieldData, selectedField } = useFieldData();
 
-  const soilNutrients = [
+  const soilNutrients = fieldData?.soilHealth?.nutrients || [
     { symbol: "P", label: "Nitrogen", thisYear: 25.4, lastYear: 20.6 },
     { symbol: "Mg", label: "Phosphorous", thisYear: 8.1, lastYear: 7.5 },
     { symbol: "K", label: "Potassium", thisYear: 10.4, lastYear: 8.1 },
   ];
+
+  const soilHealthData = fieldData?.soilHealth || {
+    healthPercentage: 60,
+    healthStatus: 'Normal',
+    cropAge: 15,
+    standardYield: 460
+  };
 
   const maxNutrientValue = Math.max(
     ...soilNutrients.flatMap((n) => [n.thisYear, n.lastYear])
@@ -17,7 +26,6 @@ export default function SoilHealth() {
 
   return (
     <div className="bg-[#0C2214] rounded-xl p-4 sm:p-5 md:px-8 md:py-5 text-white">
-      {/* Header Row */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 sm:mb-5">
         <h1 className="text-lg sm:text-xl font-bold">Crop Health</h1>
         <div className="flex items-center gap-2">
@@ -44,55 +52,60 @@ export default function SoilHealth() {
         </div>
       </div>
 
-      {/* Crop Info Section */}
       <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 mb-4 sm:mb-6">
-        {/* Crop Image */}
         <img
           src={wheatCrop}
           alt="Wheat Crop"
           className="w-full sm:w-[140px] md:w-[160px] h-[120px] sm:h-[140px] md:h-[160px] rounded-lg object-cover border border-white/10"
         />
 
-        {/* Crop Details */}
         <div className="flex-1">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-x-6 sm:gap-y-2 mb-3">
             <div className="text-xs sm:text-sm">
               <p>Major Crop :- Wheat</p>
-              <p className="mt-1 sm:mt-2">Total Area :- 1.5 Acre</p>
+              <p className="mt-1 sm:mt-2">Total Area :- {selectedField ? selectedField.area.toFixed(2) : '1.5'} Hectares</p>
               <p className="mt-1 sm:mt-2 text-xs font-semibold text-gray-300">
                 Overall Crop Health
               </p>
             </div>
             <div className="text-xs sm:text-sm">
-              <p>Crop Age :- 15 days</p>
-              <p className="mt-1 sm:mt-2">Standard Yield Data :- 460.00 kg/acre</p>
+              <p>Crop Age :- {soilHealthData.cropAge} days</p>
+              <p className="mt-1 sm:mt-2">Standard Yield Data :- {soilHealthData.standardYield} kg/hectare</p>
             </div>
           </div>
 
-          {/* Crop Health Status & Progress Bar */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-1.5">
             <div className="flex items-baseline gap-2">
-              <span className="text-xl sm:text-2xl font-bold">60%</span>
+              <span className="text-xl sm:text-2xl font-bold">{soilHealthData.healthPercentage}%</span>
               <span className="text-[10px] text-gray-400 hidden sm:inline">
                 No Precipitation within the Hour
               </span>
             </div>
-            <span className="bg-white text-yellow-600 px-3 sm:px-4 py-1 rounded-md text-xs font-medium">
-              Normal
+            <span className={`${
+              soilHealthData.healthPercentage >= 75 ? 'bg-white text-green-600' : 
+              soilHealthData.healthPercentage >= 50 ? 'bg-white text-yellow-600' : 
+              'bg-white text-red-600'
+            } px-3 sm:px-4 py-1 rounded-md text-xs font-medium`}>
+              {soilHealthData.healthStatus}
             </span>
           </div>
           <div className="w-full h-1.5 bg-white rounded-full overflow-hidden">
-            <div className="h-full bg-yellow-500 w-[60%] rounded-full"></div>
+            <div 
+              className={`h-full rounded-full ${
+                soilHealthData.healthPercentage >= 75 ? 'bg-green-500' : 
+                soilHealthData.healthPercentage >= 50 ? 'bg-yellow-500' : 
+                'bg-red-500'
+              }`}
+              style={{ width: `${soilHealthData.healthPercentage}%` }}
+            ></div>
           </div>
         </div>
       </div>
 
-      {/* Soil Analysis & Soil Health Grid */}
       <div className="mt-6 sm:mt-8 md:mt-10 grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 md:gap-14">
         <div>
           <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Soil analysis</h2>
 
-          {/* Legend */}
           <div className="flex gap-4 sm:gap-8 mb-4 sm:mb-6">
             <div className="flex items-center gap-2">
               <div className="w-4 h-1 bg-[#4ADE80] rounded" />
@@ -104,7 +117,6 @@ export default function SoilHealth() {
             </div>
           </div>
 
-          {/* Nutrients */}
           {soilNutrients.map((nutrient) => (
             <div key={nutrient.symbol} className="flex items-start gap-3 sm:gap-4 mb-6 sm:mb-8">
               <div className="w-8 h-8 sm:w-10 sm:h-10 bg-[#73E21D] rounded-full flex items-center justify-center text-white font-bold text-xs sm:text-sm shrink-0">

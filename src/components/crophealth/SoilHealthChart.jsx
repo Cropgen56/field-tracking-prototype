@@ -6,21 +6,15 @@ import leftVector from "../../assets/Vector 143.png";
 import rightVector from "../../assets/Vector 144.png";
 import st from "../../assets/st.png";
 import soil_Moisture from "../../assets/vector (5).png";
+import { useFieldData } from "../../context/FieldDataContext";
 
 const SoilHealthChart = () => {
-  const soilData = {
-    surface: {
-      temperature: "24",
-      moisture: "0.22",
-    },
-    subsoil: {
-      temperature: "22",
-      moisture: "0.25",
-    },
-    parentMaterial: {
-      temperature: "20",
-      moisture: "0.28",
-    },
+  const { fieldData } = useFieldData();
+  
+  const soilData = fieldData?.soilHealth?.layers || {
+    surface: { temperature: "24", moisture: "0.22" },
+    subsoil: { temperature: "22", moisture: "0.25" },
+    parentMaterial: { temperature: "20", moisture: "0.28" },
   };
 
   return (
@@ -62,9 +56,7 @@ const SoilHealthChart = () => {
 
       {/* Main Content */}
       <div className="flex justify-between items-center">
-        {/* Left Side - Subsoil and Parent Material Data */}
         <div className="flex flex-col items-center gap-1 w-[35%] sm:w-[40%]">
-          {/* Subsoil (5cm) */}
           <h2 className="text-cg-accent text-[10px] sm:text-xs font-bold text-center">
             Subsoil (5cm)
           </h2>
@@ -102,7 +94,6 @@ const SoilHealthChart = () => {
             </div>
           </div>
 
-          {/* Parent Material (15cm) */}
           <h2 className="text-cg-accent font-bold text-[10px] sm:text-xs text-center">
             Parent Material (15cm)
           </h2>
@@ -141,7 +132,6 @@ const SoilHealthChart = () => {
           </div>
         </div>
 
-        {/* Middle - Depth Indicator */}
         <div className="w-[10%] flex justify-center relative">
           <div className="relative w-[2px] h-[80px] sm:h-[100px] bg-gray-500">
             <span className="absolute top-0 left-full w-2 sm:w-4 h-[2px] bg-gray-500"></span>
@@ -154,7 +144,6 @@ const SoilHealthChart = () => {
           </div>
         </div>
 
-        {/* Right Side - Soil Layer Image */}
         <div className="relative w-[45%] sm:w-[50%] h-auto">
           <img
             src={soilLayerImage}
