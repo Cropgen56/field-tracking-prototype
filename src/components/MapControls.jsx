@@ -1,3 +1,4 @@
+// src/components/MapControls.jsx
 import React from "react";
 import {
   Sparkles,
@@ -21,6 +22,10 @@ export default function MapControls({
   onSaveBoundary,
   onOpenLocationModal,
   onGenerateField,
+  // NEW: field dropdown (within current crop group)
+  fieldOptions = [], // [{id, name}]
+  selectedFieldId,
+  onFieldChange,
 }) {
   return (
     <>
@@ -87,14 +92,34 @@ export default function MapControls({
 
       {/* Top Controls */}
       <div className="absolute top-2 sm:top-4 left-2 sm:left-4 right-2 sm:right-4 z-[1000] flex items-center justify-between gap-2">
-        <button
-          onClick={onOpenLocationModal}
-          className="bg-cg-panel/95 backdrop-blur-md text-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg font-semibold flex items-center gap-2 transition-all shadow-lg hover:shadow-xl border border-green-500/20 hover:border-green-500/40 hover:bg-cg-panel hover:scale-[1.02] text-xs sm:text-sm"
-        >
-          <MapPin size={16} className="text-green-400" />
-          <span className="hidden sm:inline">Set Location</span>
-          <span className="sm:hidden">Location</span>
-        </button>
+        <div className="flex items-center gap-2 sm:gap-3">
+          <button
+            onClick={onOpenLocationModal}
+            className="bg-cg-panel/95 backdrop-blur-md text-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg font-semibold flex items-center gap-2 transition-all shadow-lg hover:shadow-xl border border-green-500/20 hover:border-green-500/40 hover:bg-cg-panel hover:scale-[1.02] text-xs sm:text-sm"
+          >
+            <MapPin size={16} className="text-green-400" />
+            <span className="hidden sm:inline">Set Location</span>
+            <span className="sm:hidden">Location</span>
+          </button>
+
+          {/* NEW: field selector within current crop */}
+          {fieldOptions && fieldOptions.length > 0 && (
+            <select
+              value={selectedFieldId || ""}
+              onChange={(e) =>
+                onFieldChange && onFieldChange(e.target.value || null)
+              }
+              className="bg-cg-panel/95 backdrop-blur-md text-white px-2 sm:px-3 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm border border-green-500/20 hover:border-green-500/40 shadow-lg outline-none"
+            >
+              <option value="">All fields</option>
+              {fieldOptions.map((f) => (
+                <option key={f.id} value={f.id}>
+                  {f.name}
+                </option>
+              ))}
+            </select>
+          )}
+        </div>
 
         <button
           onClick={onGenerateField}

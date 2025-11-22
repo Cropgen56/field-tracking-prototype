@@ -1,3 +1,4 @@
+// src/components/MapSection.jsx
 import React, { useState, useRef, useEffect, useMemo } from "react";
 import {
   MapContainer,
@@ -17,7 +18,7 @@ import MapOverlays from "./MapOverlays";
 import sampleFieldsData from "./sampleFields.json";
 import { useFieldData } from "../context/FieldDataContext";
 
-// Fix for default marker icon
+// ---------- Leaflet icon fix ----------
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl:
@@ -28,7 +29,7 @@ L.Icon.Default.mergeOptions({
     "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
 });
 
-// Custom yellow marker icon for manual boundary points
+// ---------- Custom yellow marker for manual points ----------
 const yellowMarkerIcon = new L.divIcon({
   className: "yellow-marker",
   html: `<div style="
@@ -49,38 +50,61 @@ const yellowMarkerIcon = new L.divIcon({
   iconAnchor: [12, 12],
 });
 
-// NDVI-like color palette by crop health
+// ---------- Helpers for crop-health styling ----------
 const getHealthColor = (health) => {
   const value = (health || "").toLowerCase();
-
   switch (value) {
     case "very good":
-      return "#4CAF50"; // strong green
+      return "#22c55e";
     case "good":
-      return "#8BC34A"; // fresh green-yellow
+      return "#4ade80";
     case "decent":
-      return "#FFEB3B"; // yellow
+      return "#eab308";
     case "poor":
-      return "#FF5722"; // orange-red
+      return "#f97316";
     default:
-      return "#9E9E9E"; // grey "no data"
+      return "#9ca3af";
   }
 };
 
 const getSampleFieldStyle = (feature) => {
   const health = feature?.properties?.cropHealth;
   const color = getHealthColor(health);
-
   return {
     fill: true,
     fillColor: color,
-    fillOpacity: 0.8,
+    fillOpacity: 0.65,
     color,
     opacity: 0.9,
-    weight: 1,
+    weight: 1.2,
   };
 };
 
+// ---------- NEW: add IDs + better names to sampleFields ----------
+const addIdsToSampleFields = (data) => {
+  if (!data || !data.features) return data;
+
+  return {
+    ...data,
+    features: data.features.map((feature, index) => {
+      const props = feature.properties || {};
+      const cropType = props.cropType || "Field";
+      const displayName = props.name || `${cropType} Field ${index + 1}`;
+
+      return {
+        ...feature,
+        properties: {
+          ...props,
+          name: displayName,
+          // stable id used by context & map dropdown
+          _id: props._id || `sample-${index}`,
+        },
+      };
+    }),
+  };
+};
+
+// ---------- Map movement helper ----------
 const MoveMapToLocation = ({ center, bounds, onBoundsFitted }) => {
   const map = useMap();
   const previousBoundsRef = useRef(null);
@@ -88,10 +112,8 @@ const MoveMapToLocation = ({ center, bounds, onBoundsFitted }) => {
   useEffect(() => {
     if (bounds) {
       const boundsString = JSON.stringify(bounds);
-
       if (previousBoundsRef.current !== boundsString) {
         previousBoundsRef.current = boundsString;
-
         setTimeout(() => {
           try {
             map.fitBounds(bounds, {
@@ -100,12 +122,11 @@ const MoveMapToLocation = ({ center, bounds, onBoundsFitted }) => {
               animate: true,
               duration: 1,
             });
-
             if (onBoundsFitted) {
-              setTimeout(() => onBoundsFitted(), 500);
+              setTimeout(onBoundsFitted, 500);
             }
-          } catch (error) {
-            console.error("Error fitting bounds:", error);
+          } catch (err) {
+            console.error("Error fitting bounds:", err);
           }
         }, 100);
       }
@@ -116,8 +137,8 @@ const MoveMapToLocation = ({ center, bounds, onBoundsFitted }) => {
         setTimeout(() => {
           try {
             map.setView(center, 15, { animate: true });
-          } catch (error) {
-            console.error("Error setting view:", error);
+          } catch (err) {
+            console.error("Error setting view:", err);
           }
         }, 100);
       }
@@ -127,7 +148,7 @@ const MoveMapToLocation = ({ center, bounds, onBoundsFitted }) => {
   return null;
 };
 
-// Manual boundary marker handler
+// ---------- Manual marker handler ----------
 const ManualMarkerHandler = ({ isAdding, onAddMarker }) => {
   useMapEvents({
     click: (e) => {
@@ -146,10 +167,7 @@ export default function MapSection({
   onLocationChange,
   onFieldSave,
   selectedSnapshot,
-  // comes from App / sidebar ("", "Maize", "Wheat", "Tobacco" etc.)
-  selectedCrop = "",
 }) {
-  const [userLocation, setUserLocation] = useState(null);
   const [generatedPolygon, setGeneratedPolygon] = useState([]);
   const [sampleFields, setSampleFields] = useState(null);
   const [mapCenter, setMapCenter] = useState([20.5937, 78.9629]);
@@ -159,6 +177,7 @@ export default function MapSection({
   const [showLocationModal, setShowLocationModal] = useState(false);
   const [mapKey, setMapKey] = useState(0);
 
+  // manual draw state
   const [manualMarkers, setManualMarkers] = useState([]);
   const [isAddingManual, setIsAddingManual] = useState(false);
   const [manualArea, setManualArea] = useState(0);
@@ -169,56 +188,34 @@ export default function MapSection({
   const mapRef = useRef(null);
   const lastSnapshotIdRef = useRef(null);
 
-  const { selectField } = useFieldData();
+  const {
+    selectedCrop,
+    selectField, // for saved snapshot fields
+    selectedSampleFieldId, // id of current sample field
+    selectSampleField, // set sample field
+  } = useFieldData();
 
-  const showToast = (message, type = "success") => {
-    setToast({ message, type });
-  };
+  const showToast = (message, type = "success") => setToast({ message, type });
 
-  // FILTERED SAMPLE FIELDS (case-insensitive by crop)
-  const filteredSampleFields = useMemo(() => {
-    if (!sampleFields) return null;
-
-    // "" or null ⇒ ALL crops
-    if (!selectedCrop) return sampleFields;
-
-    const target = selectedCrop.toLowerCase();
-
-    return {
-      ...sampleFields,
-      features: sampleFields.features.filter((f) => {
-        const crop = (f?.properties?.cropType || "").toLowerCase();
-        return crop === target;
-      }),
-    };
-  }, [sampleFields, selectedCrop]);
-
-  // Load snapshot when selected
+  // ------- handle saved snapshot selection -------
   useEffect(() => {
     if (
       selectedSnapshot &&
       selectedSnapshot.markers &&
       selectedSnapshot.id !== lastSnapshotIdRef.current
     ) {
-      console.log(
-        "Loading snapshot:",
-        selectedSnapshot.name,
-        selectedSnapshot.id
-      );
       lastSnapshotIdRef.current = selectedSnapshot.id;
 
       selectField(selectedSnapshot);
       setManualMarkers(selectedSnapshot.markers);
       setGeneratedPolygon([]);
-      setSampleFields(null); // hide sample polygons when viewing saved field
+      setSampleFields(null);
 
       if (selectedSnapshot.markers.length > 0) {
         const lats = selectedSnapshot.markers.map((m) => m.lat);
         const lngs = selectedSnapshot.markers.map((m) => m.lng);
-
         const centerLat = (Math.min(...lats) + Math.max(...lats)) / 2;
         const centerLng = (Math.min(...lngs) + Math.max(...lngs)) / 2;
-
         setMapCenter([centerLat, centerLng]);
         setShouldFitBounds(true);
         setMapKey((prev) => prev + 1);
@@ -229,25 +226,7 @@ export default function MapSection({
     }
   }, [selectedSnapshot, selectField]);
 
-  // geo, external location, uploadedData, manual area etc...
-  // 👉 keep exactly your previous effects and handlers here
-  // (omitted for brevity – you can keep them unchanged)
-
-  useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          const location = [latitude, longitude];
-          setUserLocation(location);
-          setMapCenter(location);
-        },
-        (error) => console.error("Error getting location:", error),
-        { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
-      );
-    }
-  }, []);
-
+  // ------- external location (search) -------
   useEffect(() => {
     if (externalLocation) {
       setMapCenter(externalLocation);
@@ -255,12 +234,9 @@ export default function MapSection({
     }
   }, [externalLocation]);
 
+  // ------- uploaded geojson -------
   useEffect(() => {
-    if (
-      uploadedData &&
-      uploadedData.coordinates &&
-      uploadedData.coordinates.length > 0
-    ) {
+    if (uploadedData && uploadedData.coordinates?.length) {
       setGeneratedPolygon(uploadedData.coordinates);
       setShouldFitBounds(true);
       setSampleFields(null);
@@ -276,6 +252,7 @@ export default function MapSection({
     }
   }, [uploadedData]);
 
+  // ------- manual area + geojson -------
   useEffect(() => {
     if (manualMarkers.length >= 3) {
       const coords = manualMarkers.map((m) => [m.lng, m.lat]);
@@ -304,22 +281,25 @@ export default function MapSection({
     }
   }, [manualMarkers]);
 
+  // ------- drawing cursor -------
   useEffect(() => {
     if (mapRef.current) {
-      const mapContainer = mapRef.current.getContainer();
-      mapContainer.style.cursor = isAddingManual ? "crosshair" : "";
+      mapRef.current.getContainer().style.cursor = isAddingManual
+        ? "crosshair"
+        : "";
     }
   }, [isAddingManual]);
 
+  // ------- Generate sample fields (with IDs + names) -------
   const handleGenerateField = () => {
     setIsGenerating(true);
 
     setTimeout(() => {
-      // load ALL sample fields when button clicked
-      setSampleFields(sampleFieldsData);
+      const enriched = addIdsToSampleFields(sampleFieldsData);
+      setSampleFields(enriched);
 
       const allCoords = [];
-      sampleFieldsData.features.forEach((feature) => {
+      enriched.features.forEach((feature) => {
         if (feature.geometry.type === "Polygon") {
           feature.geometry.coordinates[0].forEach((coord) => {
             allCoords.push({ lng: coord[0], lat: coord[1] });
@@ -332,7 +312,6 @@ export default function MapSection({
         const lngs = allCoords.map((c) => c.lng);
         const centerLat = (Math.min(...lats) + Math.max(...lats)) / 2;
         const centerLng = (Math.min(...lngs) + Math.max(...lngs)) / 2;
-
         setMapCenter([centerLat, centerLng]);
         setMapKey((prev) => prev + 1);
       }
@@ -342,26 +321,25 @@ export default function MapSection({
       setShouldFitBounds(true);
       setIsGenerating(false);
 
-      const totalArea = sampleFieldsData.features.reduce((sum, feature) => {
-        return sum + parseFloat(feature.properties.area_ha || 0);
+      const totalArea = enriched.features.reduce((sum, f) => {
+        return sum + parseFloat(f.properties.area_ha || 0);
       }, 0);
 
       showToast(
         `${
-          sampleFieldsData.features.length
+          enriched.features.length
         } sample fields loaded! Total area: ${totalArea.toFixed(2)} ha`,
         "success"
       );
-    }, 1000);
+    }, 800);
   };
 
-  // undo / clear / save / toggle / zoom / bounds – keep same as earlier
-  const handleAddManualMarker = (marker) => {
+  // ------- manual draw handlers -------
+  const handleAddManualMarker = (marker) =>
     setManualMarkers((prev) => [...prev, marker]);
-  };
 
   const handleUndoLastMarker = () => {
-    if (manualMarkers.length === 0) {
+    if (!manualMarkers.length) {
       showToast("No markers to undo", "warning");
       return;
     }
@@ -370,7 +348,7 @@ export default function MapSection({
   };
 
   const handleClearAllMarkers = () => {
-    if (manualMarkers.length === 0) {
+    if (!manualMarkers.length) {
       showToast("No markers to clear", "warning");
       return;
     }
@@ -401,9 +379,7 @@ export default function MapSection({
       localStorage.setItem("fieldSnapshots", JSON.stringify(updatedSnapshots));
       window.dispatchEvent(new Event("localStorageUpdated"));
 
-      if (onFieldSave) {
-        onFieldSave(boundaryData);
-      }
+      if (onFieldSave) onFieldSave(boundaryData);
 
       showToast(
         `Field saved! Area: ${manualArea.toFixed(2)} hectares`,
@@ -412,8 +388,8 @@ export default function MapSection({
 
       setManualMarkers([]);
       setIsAddingManual(false);
-    } catch (error) {
-      console.error("Error saving boundary:", error);
+    } catch (err) {
+      console.error("Error saving boundary:", err);
       showToast("Failed to save field. Please try again.", "error");
     }
   };
@@ -423,7 +399,7 @@ export default function MapSection({
       showToast("Please save or clear existing field first", "warning");
       return;
     }
-    setIsAddingManual(!isAddingManual);
+    setIsAddingManual((prev) => !prev);
     showToast(
       !isAddingManual
         ? "Click on map to add boundary points"
@@ -432,26 +408,56 @@ export default function MapSection({
     );
   };
 
-  const handleZoomIn = () => {
-    if (mapRef.current) mapRef.current.zoomIn();
-  };
+  const handleZoomIn = () => mapRef.current && mapRef.current.zoomIn();
+  const handleZoomOut = () => mapRef.current && mapRef.current.zoomOut();
+  const handleBoundsFitted = () => setShouldFitBounds(false);
 
-  const handleZoomOut = () => {
-    if (mapRef.current) mapRef.current.zoomOut();
-  };
+  // ------- filter sample fields by crop + selected field -------
+  const filteredSampleFields = useMemo(() => {
+    if (!sampleFields) return null;
 
-  const handleBoundsFitted = () => {
-    setShouldFitBounds(false);
-  };
+    let features = sampleFields.features;
+
+    if (selectedCrop) {
+      const target = selectedCrop.toLowerCase();
+      features = features.filter(
+        (f) => (f?.properties?.cropType || "").toLowerCase() === target
+      );
+    }
+
+    if (selectedSampleFieldId) {
+      features = features.filter(
+        (f) => f.properties?._id === selectedSampleFieldId
+      );
+    }
+
+    return { ...sampleFields, features };
+  }, [sampleFields, selectedCrop, selectedSampleFieldId]);
+
+  // ------- options for field dropdown -------
+  const fieldOptions = useMemo(() => {
+    if (!sampleFields) return [];
+    let features = sampleFields.features;
+
+    if (selectedCrop) {
+      const target = selectedCrop.toLowerCase();
+      features = features.filter(
+        (f) => (f?.properties?.cropType || "").toLowerCase() === target
+      );
+    }
+
+    return features.map((f, index) => ({
+      id: f.properties?._id,
+      name:
+        f.properties?.name ||
+        `${f.properties?.cropType || "Field"} ${index + 1}`,
+    }));
+  }, [sampleFields, selectedCrop]);
 
   const polygonBounds = useMemo(() => {
     const activeSample = filteredSampleFields || sampleFields;
 
-    if (
-      activeSample &&
-      activeSample.features &&
-      activeSample.features.length > 0
-    ) {
+    if (activeSample?.features?.length) {
       const allCoords = [];
       activeSample.features.forEach((feature) => {
         if (feature.geometry.type === "Polygon") {
@@ -461,7 +467,7 @@ export default function MapSection({
         }
       });
 
-      if (allCoords.length > 0) {
+      if (allCoords.length) {
         const lats = allCoords.map((c) => c.lat);
         const lngs = allCoords.map((c) => c.lng);
         return [
@@ -471,12 +477,10 @@ export default function MapSection({
       }
     }
 
-    if (generatedPolygon.length === 0 && manualMarkers.length === 0)
-      return null;
+    if (!generatedPolygon.length && !manualMarkers.length) return null;
 
-    let lats;
-    let lngs;
-    if (manualMarkers.length > 0) {
+    let lats, lngs;
+    if (manualMarkers.length) {
       lats = manualMarkers.map((c) => c.lat);
       lngs = manualMarkers.map((c) => c.lng);
     } else {
@@ -507,7 +511,8 @@ export default function MapSection({
             maxZoom={20}
           />
 
-          {uploadedData && uploadedData.geojson && (
+          {/* Uploaded GeoJSON */}
+          {uploadedData?.geojson && (
             <GeoJSON
               key={uploadedData.fileName}
               data={uploadedData.geojson}
@@ -520,14 +525,16 @@ export default function MapSection({
             />
           )}
 
-          {/* 🔥 sample fields filtered strictly by selectedCrop */}
-          {filteredSampleFields && filteredSampleFields.features && (
+          {/* Sample fields */}
+          {filteredSampleFields?.features && (
             <GeoJSON
-              key={`sample-fields-${selectedCrop || "all"}`}
+              key={`sample-fields-${selectedCrop || "all"}-${
+                selectedSampleFieldId || "all"
+              }`}
               data={filteredSampleFields}
               style={getSampleFieldStyle}
               onEachFeature={(feature, layer) => {
-                if (feature.properties && feature.properties.name) {
+                if (feature.properties?.name) {
                   const { name, area_ha, cropType, cropHealth } =
                     feature.properties;
                   layer.bindPopup(`
@@ -543,9 +550,10 @@ export default function MapSection({
             />
           )}
 
+          {/* Generated polygon when no sample/manual */}
           {generatedPolygon.length > 0 &&
             !uploadedData?.geojson &&
-            manualMarkers.length === 0 &&
+            !manualMarkers.length &&
             !sampleFields && (
               <Polygon
                 positions={generatedPolygon.map(({ lat, lng }) => [lat, lng])}
@@ -558,6 +566,7 @@ export default function MapSection({
               />
             )}
 
+          {/* Manual markers + polygon */}
           {manualMarkers.map((marker, i) => (
             <Marker
               key={i}
@@ -591,6 +600,7 @@ export default function MapSection({
           />
         </MapContainer>
 
+        {/* Controls */}
         <MapControls
           isAddingManual={isAddingManual}
           isGenerating={isGenerating}
@@ -602,6 +612,9 @@ export default function MapSection({
           onSaveBoundary={handleSaveBoundary}
           onOpenLocationModal={() => setShowLocationModal(true)}
           onGenerateField={handleGenerateField}
+          fieldOptions={fieldOptions}
+          selectedFieldId={selectedSampleFieldId}
+          onFieldChange={selectSampleField}
         />
 
         <MapOverlays

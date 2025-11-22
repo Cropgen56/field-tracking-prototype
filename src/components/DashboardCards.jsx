@@ -1,3 +1,4 @@
+// src/components/DashboardCards.jsx
 import React from "react";
 import ndviIcon from "../assets/ndvi-graph.png";
 import areaIcon from "../assets/area.png";
@@ -8,19 +9,21 @@ import { useFieldData } from "../context/FieldDataContext";
 export default function DashboardCards() {
   const { fieldData } = useFieldData();
 
-  // Default data when no field is selected
   const defaultData = {
-    avgNDVI: { value: '0.68', change: '+5.2', positive: true },
+    avgNDVI: { value: "0.68", change: "+5.2", positive: true },
     totalArea: 1247,
     healthyFarms: { healthy: 23, total: 28 },
-    lowIndexFarms: 5
+    lowIndexFarms: 5,
   };
 
   const data = fieldData?.dashboardData || defaultData;
 
+  const totalAreaValue = fieldData
+    ? (data.totalArea || 0).toFixed(2)
+    : data.totalArea;
+
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-4 w-full">
-      
       {/* Avg NDVI */}
       <div className="bg-[#0C2214] rounded-xl sm:rounded-2xl p-3 sm:p-4 md:px-6 md:py-6 shadow-xl flex items-center justify-between">
         <div className="flex flex-col justify-evenly h-full">
@@ -31,12 +34,22 @@ export default function DashboardCards() {
             <p className="text-white text-base sm:text-lg md:text-xl font-semibold leading-none">
               {data.avgNDVI.value}
             </p>
-            <span className={`text-${data.avgNDVI.positive ? 'green' : 'red'}-400 text-[10px] sm:text-[11px] md:text-[12px] font-medium leading-none whitespace-nowrap`}>
-              {data.avgNDVI.positive ? '↑' : '↓'} {data.avgNDVI.positive ? '+' : ''}{data.avgNDVI.change}%
+            <span
+              className={`text-${
+                data.avgNDVI.positive ? "green" : "red"
+              }-400 text-[10px] sm:text-[11px] md:text-[12px] font-medium leading-none whitespace-nowrap`}
+            >
+              {data.avgNDVI.positive ? "↑" : "↓"}{" "}
+              {data.avgNDVI.positive ? "+" : ""}
+              {data.avgNDVI.change}%
             </span>
           </div>
         </div>
-        <img src={ndviIcon} alt="ndvi graph icon" className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 object-contain" />
+        <img
+          src={ndviIcon}
+          alt="ndvi graph icon"
+          className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 object-contain"
+        />
       </div>
 
       {/* Total Area */}
@@ -47,14 +60,18 @@ export default function DashboardCards() {
           </p>
           <div className="flex-col">
             <p className="text-white text-base sm:text-lg md:text-xl font-semibold leading-none">
-              {fieldData ? data.totalArea.toFixed(2) : data.totalArea}
+              {totalAreaValue}
             </p>
             <span className="text-green-400 text-[10px] sm:text-[11px] md:text-[12px] leading-none">
               Hectares
             </span>
           </div>
         </div>
-        <img src={areaIcon} alt="area icon" className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 object-contain" />
+        <img
+          src={areaIcon}
+          alt="area icon"
+          className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 object-contain"
+        />
       </div>
 
       {/* Healthy Farms */}
@@ -72,7 +89,11 @@ export default function DashboardCards() {
             </span>
           </div>
         </div>
-        <img src={healthyIcon} alt="healthy farm icon" className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 object-contain" />
+        <img
+          src={healthyIcon}
+          alt="healthy farm icon"
+          className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 object-contain"
+        />
       </div>
 
       {/* Low Index Farms */}
@@ -90,9 +111,12 @@ export default function DashboardCards() {
             </span>
           </div>
         </div>
-        <img src={warningIcon} alt="warning icon" className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 object-contain" />
+        <img
+          src={warningIcon}
+          alt="warning icon"
+          className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 object-contain"
+        />
       </div>
-
     </div>
   );
 }
