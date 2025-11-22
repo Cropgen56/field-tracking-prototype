@@ -1,5 +1,14 @@
-import React from 'react';
-import { Sparkles, Plus, Minus, MapPin, Pause, Undo, Trash2, Save } from 'lucide-react';
+import React from "react";
+import {
+  Sparkles,
+  Plus,
+  Minus,
+  MapPin,
+  Pause,
+  Undo,
+  Trash2,
+  Save,
+} from "lucide-react";
 
 export default function MapControls({
   isAddingManual,
@@ -38,9 +47,9 @@ export default function MapControls({
         <button
           onClick={onToggleAddMode}
           className={`backdrop-blur-md text-white w-10 h-10 sm:w-11 sm:h-11 rounded-lg flex items-center justify-center shadow-lg transition-all hover:scale-105 active:scale-95 border ${
-            isAddingManual 
-              ? 'bg-yellow-600/90 border-yellow-400/60 hover:bg-yellow-600' 
-              : 'bg-cg-panel/95 border-green-500/20 hover:border-green-500/40 hover:bg-cg-panel'
+            isAddingManual
+              ? "bg-yellow-600/90 border-yellow-400/60 hover:bg-yellow-600"
+              : "bg-cg-panel/95 border-green-500/20 hover:border-green-500/40 hover:bg-cg-panel"
           }`}
           title={isAddingManual ? "Stop adding markers" : "Add manual markers"}
         >
@@ -94,7 +103,11 @@ export default function MapControls({
             bg-cg-panel/95 backdrop-blur-md text-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg font-semibold 
             flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-xl
             text-xs sm:text-sm border border-green-500/20 hover:border-green-500/40
-            ${isGenerating ? 'opacity-75 cursor-wait' : 'hover:bg-cg-panel hover:scale-[1.02]'}
+            ${
+              isGenerating
+                ? "opacity-75 cursor-wait"
+                : "hover:bg-cg-panel hover:scale-[1.02]"
+            }
           `}
         >
           {isGenerating ? (
@@ -106,7 +119,9 @@ export default function MapControls({
             <>
               <Sparkles size={16} className="text-green-400" />
               <span className="hidden xl:inline">Generate Sample Fields</span>
-              <span className="xl:hidden hidden sm:inline">Generate Fields</span>
+              <span className="xl:hidden hidden sm:inline">
+                Generate Fields
+              </span>
               <span className="sm:hidden">Gen</span>
             </>
           )}

@@ -17,7 +17,9 @@
       },
       "properties": {
         "area_ha": "5.38",
-        "name": "Field 1"
+        "name": "Field 1",
+        "cropType": "Tobacco",
+        "cropHealth": "Very Good"
       }
     },
     {
@@ -38,7 +40,9 @@
       },
       "properties": {
         "area_ha": "1.74",
-        "name": "Field 2"
+        "name": "Field 2",
+        "cropType": "Tobacco",
+        "cropHealth": "Good"
       }
     },
     {
@@ -59,7 +63,9 @@
       },
       "properties": {
         "area_ha": "2.99",
-        "name": "Field 3"
+        "name": "Field 3",
+        "cropType": "Tobacco",
+        "cropHealth": "Decent"
       }
     },
     {
@@ -78,7 +84,9 @@
       },
       "properties": {
         "area_ha": "4.27",
-        "name": "Field 4"
+        "name": "Field 4",
+        "cropType": "Tobacco",
+        "cropHealth": "Poor"
       }
     },
     {
@@ -97,7 +105,9 @@
       },
       "properties": {
         "area_ha": "3.34",
-        "name": "Field 5"
+        "name": "Field 5",
+        "cropType": "Maize",
+        "cropHealth": "Very Good"
       }
     },
     {
@@ -116,7 +126,9 @@
       },
       "properties": {
         "area_ha": "2.75",
-        "name": "Field 6"
+        "name": "Field 6",
+        "cropType": "Maize",
+        "cropHealth": "Decent"
       }
     },
     {
@@ -135,7 +147,9 @@
       },
       "properties": {
         "area_ha": "1.56",
-        "name": "Field 7"
+        "name": "Field 7",
+        "cropType": "Wheat",
+        "cropHealth": "Good"
       }
     },
     {
@@ -158,7 +172,9 @@
       },
       "properties": {
         "area_ha": "5.29",
-        "name": "Field 8"
+        "name": "Field 8",
+        "cropType": "Wheat",
+        "cropHealth": "Poor"
       }
     },
     {
@@ -177,7 +193,9 @@
       },
       "properties": {
         "area_ha": "1.98",
-        "name": "Field 9"
+        "name": "Field 9",
+        "cropType": "Other",
+        "cropHealth": "Decent"
       }
     }
   ]
