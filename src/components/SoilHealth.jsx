@@ -6,7 +6,13 @@ import { useFieldData } from "../context/FieldDataContext";
 
 export default function SoilHealth() {
   const [autoDetectCrop, setAutoDetectCrop] = useState(true);
-  const { fieldData, selectedField, selectedCrop } = useFieldData();
+  const { fieldData } = useFieldData();
+
+  const soilNutrients = fieldData?.soilHealth?.nutrients || [
+    { symbol: "P", label: "Nitrogen", thisYear: 25.4, lastYear: 20.6 },
+    { symbol: "Mg", label: "Phosphorous", thisYear: 8.1, lastYear: 7.5 },
+    { symbol: "K", label: "Potassium", thisYear: 10.4, lastYear: 8.1 },
+  ];
 
   const soilHealthData = fieldData?.soilHealth || {
     healthPercentage: 60,
@@ -15,23 +21,13 @@ export default function SoilHealth() {
     standardYield: 460,
   };
 
-  const soilNutrients = fieldData?.soilHealth?.nutrients || [
-    { symbol: "P", label: "Nitrogen", thisYear: 25.4, lastYear: 20.6 },
-    { symbol: "Mg", label: "Phosphorous", thisYear: 8.1, lastYear: 7.5 },
-    { symbol: "K", label: "Potassium", thisYear: 10.4, lastYear: 8.1 },
-  ];
+  const majorCrop = autoDetectCrop ? fieldData?.majorCrop || "Wheat" : "Wheat";
+
+  const totalArea = fieldData?.totalArea || 1.5;
 
   const maxNutrientValue = Math.max(
     ...soilNutrients.flatMap((n) => [n.thisYear, n.lastYear])
   );
-
-  const majorCropName = autoDetectCrop
-    ? fieldData?.majorCrop?.name || selectedCrop || "Wheat"
-    : "Wheat";
-
-  const totalArea = selectedField
-    ? selectedField.area
-    : fieldData?.dashboardData?.totalArea || 1.5;
 
   return (
     <div className="bg-[#0C2214] rounded-xl p-4 sm:p-5 md:px-8 md:py-5 text-white">
@@ -71,7 +67,7 @@ export default function SoilHealth() {
         <div className="flex-1">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-x-6 sm:gap-y-2 mb-3">
             <div className="text-xs sm:text-sm">
-              <p>Major Crop :- {majorCropName}</p>
+              <p>Major Crop :- {majorCrop}</p>
               <p className="mt-1 sm:mt-2">
                 Total Area :- {totalArea.toFixed(2)} Hectares
               </p>
@@ -93,7 +89,7 @@ export default function SoilHealth() {
                 {soilHealthData.healthPercentage}%
               </span>
               <span className="text-[10px] text-gray-400 hidden sm:inline">
-                Based on current soil analysis
+                Based on vegetation & soil indices
               </span>
             </div>
             <span

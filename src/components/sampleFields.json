@@ -17,9 +17,66 @@
       },
       "properties": {
         "area_ha": "5.38",
-        "name": "Field 1",
+        "name": "Tobacco Field 1",
         "cropType": "Tobacco",
-        "cropHealth": "Very Good"
+        "cropImage": "/tobacco.jpg",
+        "cropHealth": "Very Good",
+        "cropHealthPercent": 88,
+        "sowingDate": "2025-09-15",
+        "standardYield": 2200,
+        "avgNDVI": 0.82,
+        "evi": 0.68,
+        "savi": 0.79,
+        "vhi": 72.5,
+        "ndviSeries": [
+          { "name": "Day 1", "v": 0.76 },
+          { "name": "Day 2", "v": 0.78 },
+          { "name": "Day 3", "v": 0.8 },
+          { "name": "Day 4", "v": 0.83 },
+          { "name": "Day 5", "v": 0.84 },
+          { "name": "Day 6", "v": 0.83 },
+          { "name": "Day 7", "v": 0.82 }
+        ],
+        "waterSeries": [
+          { "name": "Day 1", "v": 0.26 },
+          { "name": "Day 2", "v": 0.27 },
+          { "name": "Day 3", "v": 0.28 },
+          { "name": "Day 4", "v": 0.29 },
+          { "name": "Day 5", "v": 0.3 },
+          { "name": "Day 6", "v": 0.29 },
+          { "name": "Day 7", "v": 0.28 }
+        ],
+        "soilHealth": {
+          "healthPercentage": 88,
+          "healthStatus": "Excellent",
+          "cropAge": 65,
+          "standardYield": 2200,
+          "nutrients": [
+            {
+              "symbol": "N",
+              "label": "Nitrogen",
+              "thisYear": 48,
+              "lastYear": 52
+            },
+            {
+              "symbol": "P",
+              "label": "Phosphorus",
+              "thisYear": 24,
+              "lastYear": 28
+            },
+            {
+              "symbol": "K",
+              "label": "Potassium",
+              "thisYear": 180,
+              "lastYear": 190
+            }
+          ],
+          "layers": {
+            "surface": { "temperature": "26", "moisture": "0.30" },
+            "subsoil": { "temperature": "24", "moisture": "0.27" },
+            "parentMaterial": { "temperature": "22", "moisture": "0.25" }
+          }
+        }
       }
     },
     {
@@ -40,9 +97,66 @@
       },
       "properties": {
         "area_ha": "1.74",
-        "name": "Field 2",
+        "name": "Tobacco Field 2",
         "cropType": "Tobacco",
-        "cropHealth": "Good"
+        "cropImage": "/tobacco.jpg",
+        "cropHealth": "Good",
+        "cropHealthPercent": 76,
+        "sowingDate": "2025-09-22",
+        "standardYield": 2100,
+        "avgNDVI": 0.74,
+        "evi": 0.61,
+        "savi": 0.71,
+        "vhi": 64.2,
+        "ndviSeries": [
+          { "name": "Day 1", "v": 0.7 },
+          { "name": "Day 2", "v": 0.71 },
+          { "name": "Day 3", "v": 0.73 },
+          { "name": "Day 4", "v": 0.75 },
+          { "name": "Day 5", "v": 0.76 },
+          { "name": "Day 6", "v": 0.75 },
+          { "name": "Day 7", "v": 0.74 }
+        ],
+        "waterSeries": [
+          { "name": "Day 1", "v": 0.24 },
+          { "name": "Day 2", "v": 0.25 },
+          { "name": "Day 3", "v": 0.25 },
+          { "name": "Day 4", "v": 0.26 },
+          { "name": "Day 5", "v": 0.27 },
+          { "name": "Day 6", "v": 0.26 },
+          { "name": "Day 7", "v": 0.25 }
+        ],
+        "soilHealth": {
+          "healthPercentage": 76,
+          "healthStatus": "Good",
+          "cropAge": 58,
+          "standardYield": 2100,
+          "nutrients": [
+            {
+              "symbol": "N",
+              "label": "Nitrogen",
+              "thisYear": 42,
+              "lastYear": 50
+            },
+            {
+              "symbol": "P",
+              "label": "Phosphorus",
+              "thisYear": 22,
+              "lastYear": 27
+            },
+            {
+              "symbol": "K",
+              "label": "Potassium",
+              "thisYear": 165,
+              "lastYear": 185
+            }
+          ],
+          "layers": {
+            "surface": { "temperature": "25", "moisture": "0.27" },
+            "subsoil": { "temperature": "23", "moisture": "0.25" },
+            "parentMaterial": { "temperature": "21", "moisture": "0.23" }
+          }
+        }
       }
     },
     {
@@ -63,9 +177,66 @@
       },
       "properties": {
         "area_ha": "2.99",
-        "name": "Field 3",
+        "name": "Tobacco Field 3",
         "cropType": "Tobacco",
-        "cropHealth": "Decent"
+        "cropImage": "/tobacco.jpg",
+        "cropHealth": "Decent",
+        "cropHealthPercent": 63,
+        "sowingDate": "2025-10-01",
+        "standardYield": 1950,
+        "avgNDVI": 0.64,
+        "evi": 0.53,
+        "savi": 0.61,
+        "vhi": 56.3,
+        "ndviSeries": [
+          { "name": "Day 1", "v": 0.6 },
+          { "name": "Day 2", "v": 0.61 },
+          { "name": "Day 3", "v": 0.63 },
+          { "name": "Day 4", "v": 0.64 },
+          { "name": "Day 5", "v": 0.66 },
+          { "name": "Day 6", "v": 0.65 },
+          { "name": "Day 7", "v": 0.64 }
+        ],
+        "waterSeries": [
+          { "name": "Day 1", "v": 0.22 },
+          { "name": "Day 2", "v": 0.22 },
+          { "name": "Day 3", "v": 0.23 },
+          { "name": "Day 4", "v": 0.24 },
+          { "name": "Day 5", "v": 0.24 },
+          { "name": "Day 6", "v": 0.23 },
+          { "name": "Day 7", "v": 0.22 }
+        ],
+        "soilHealth": {
+          "healthPercentage": 63,
+          "healthStatus": "Normal",
+          "cropAge": 52,
+          "standardYield": 1950,
+          "nutrients": [
+            {
+              "symbol": "N",
+              "label": "Nitrogen",
+              "thisYear": 36,
+              "lastYear": 48
+            },
+            {
+              "symbol": "P",
+              "label": "Phosphorus",
+              "thisYear": 20,
+              "lastYear": 26
+            },
+            {
+              "symbol": "K",
+              "label": "Potassium",
+              "thisYear": 150,
+              "lastYear": 180
+            }
+          ],
+          "layers": {
+            "surface": { "temperature": "24", "moisture": "0.24" },
+            "subsoil": { "temperature": "22", "moisture": "0.22" },
+            "parentMaterial": { "temperature": "20", "moisture": "0.21" }
+          }
+        }
       }
     },
     {
@@ -84,9 +255,66 @@
       },
       "properties": {
         "area_ha": "4.27",
-        "name": "Field 4",
+        "name": "Tobacco Field 4",
         "cropType": "Tobacco",
-        "cropHealth": "Poor"
+        "cropImage": "/tobacco.jpg",
+        "cropHealth": "Poor",
+        "cropHealthPercent": 41,
+        "sowingDate": "2025-10-10",
+        "standardYield": 1800,
+        "avgNDVI": 0.46,
+        "evi": 0.39,
+        "savi": 0.44,
+        "vhi": 39.8,
+        "ndviSeries": [
+          { "name": "Day 1", "v": 0.42 },
+          { "name": "Day 2", "v": 0.43 },
+          { "name": "Day 3", "v": 0.45 },
+          { "name": "Day 4", "v": 0.47 },
+          { "name": "Day 5", "v": 0.48 },
+          { "name": "Day 6", "v": 0.47 },
+          { "name": "Day 7", "v": 0.46 }
+        ],
+        "waterSeries": [
+          { "name": "Day 1", "v": 0.18 },
+          { "name": "Day 2", "v": 0.19 },
+          { "name": "Day 3", "v": 0.19 },
+          { "name": "Day 4", "v": 0.2 },
+          { "name": "Day 5", "v": 0.21 },
+          { "name": "Day 6", "v": 0.2 },
+          { "name": "Day 7", "v": 0.19 }
+        ],
+        "soilHealth": {
+          "healthPercentage": 41,
+          "healthStatus": "Needs Attention",
+          "cropAge": 44,
+          "standardYield": 1800,
+          "nutrients": [
+            {
+              "symbol": "N",
+              "label": "Nitrogen",
+              "thisYear": 26,
+              "lastYear": 45
+            },
+            {
+              "symbol": "P",
+              "label": "Phosphorus",
+              "thisYear": 14,
+              "lastYear": 24
+            },
+            {
+              "symbol": "K",
+              "label": "Potassium",
+              "thisYear": 120,
+              "lastYear": 170
+            }
+          ],
+          "layers": {
+            "surface": { "temperature": "23", "moisture": "0.20" },
+            "subsoil": { "temperature": "21", "moisture": "0.19" },
+            "parentMaterial": { "temperature": "19", "moisture": "0.18" }
+          }
+        }
       }
     },
     {
@@ -105,9 +333,66 @@
       },
       "properties": {
         "area_ha": "3.34",
-        "name": "Field 5",
+        "name": "Maize Field 1",
         "cropType": "Maize",
-        "cropHealth": "Very Good"
+        "cropImage": "/maize.jpg",
+        "cropHealth": "Very Good",
+        "cropHealthPercent": 90,
+        "sowingDate": "2025-08-25",
+        "standardYield": 5200,
+        "avgNDVI": 0.86,
+        "evi": 0.72,
+        "savi": 0.83,
+        "vhi": 75.4,
+        "ndviSeries": [
+          { "name": "Day 1", "v": 0.8 },
+          { "name": "Day 2", "v": 0.82 },
+          { "name": "Day 3", "v": 0.84 },
+          { "name": "Day 4", "v": 0.87 },
+          { "name": "Day 5", "v": 0.88 },
+          { "name": "Day 6", "v": 0.87 },
+          { "name": "Day 7", "v": 0.86 }
+        ],
+        "waterSeries": [
+          { "name": "Day 1", "v": 0.29 },
+          { "name": "Day 2", "v": 0.3 },
+          { "name": "Day 3", "v": 0.31 },
+          { "name": "Day 4", "v": 0.32 },
+          { "name": "Day 5", "v": 0.33 },
+          { "name": "Day 6", "v": 0.32 },
+          { "name": "Day 7", "v": 0.31 }
+        ],
+        "soilHealth": {
+          "healthPercentage": 90,
+          "healthStatus": "Excellent",
+          "cropAge": 86,
+          "standardYield": 5200,
+          "nutrients": [
+            {
+              "symbol": "N",
+              "label": "Nitrogen",
+              "thisYear": 95,
+              "lastYear": 110
+            },
+            {
+              "symbol": "P",
+              "label": "Phosphorus",
+              "thisYear": 40,
+              "lastYear": 45
+            },
+            {
+              "symbol": "K",
+              "label": "Potassium",
+              "thisYear": 210,
+              "lastYear": 230
+            }
+          ],
+          "layers": {
+            "surface": { "temperature": "27", "moisture": "0.32" },
+            "subsoil": { "temperature": "25", "moisture": "0.30" },
+            "parentMaterial": { "temperature": "23", "moisture": "0.27" }
+          }
+        }
       }
     },
     {
@@ -126,9 +411,66 @@
       },
       "properties": {
         "area_ha": "2.75",
-        "name": "Field 6",
+        "name": "Maize Field 2",
         "cropType": "Maize",
-        "cropHealth": "Decent"
+        "cropImage": "/maize.jpg",
+        "cropHealth": "Decent",
+        "cropHealthPercent": 61,
+        "sowingDate": "2025-09-05",
+        "standardYield": 5000,
+        "avgNDVI": 0.66,
+        "evi": 0.55,
+        "savi": 0.63,
+        "vhi": 58.7,
+        "ndviSeries": [
+          { "name": "Day 1", "v": 0.61 },
+          { "name": "Day 2", "v": 0.63 },
+          { "name": "Day 3", "v": 0.65 },
+          { "name": "Day 4", "v": 0.67 },
+          { "name": "Day 5", "v": 0.68 },
+          { "name": "Day 6", "v": 0.67 },
+          { "name": "Day 7", "v": 0.66 }
+        ],
+        "waterSeries": [
+          { "name": "Day 1", "v": 0.23 },
+          { "name": "Day 2", "v": 0.24 },
+          { "name": "Day 3", "v": 0.25 },
+          { "name": "Day 4", "v": 0.25 },
+          { "name": "Day 5", "v": 0.26 },
+          { "name": "Day 6", "v": 0.25 },
+          { "name": "Day 7", "v": 0.24 }
+        ],
+        "soilHealth": {
+          "healthPercentage": 61,
+          "healthStatus": "Normal",
+          "cropAge": 75,
+          "standardYield": 5000,
+          "nutrients": [
+            {
+              "symbol": "N",
+              "label": "Nitrogen",
+              "thisYear": 78,
+              "lastYear": 105
+            },
+            {
+              "symbol": "P",
+              "label": "Phosphorus",
+              "thisYear": 34,
+              "lastYear": 42
+            },
+            {
+              "symbol": "K",
+              "label": "Potassium",
+              "thisYear": 190,
+              "lastYear": 220
+            }
+          ],
+          "layers": {
+            "surface": { "temperature": "26", "moisture": "0.28" },
+            "subsoil": { "temperature": "24", "moisture": "0.26" },
+            "parentMaterial": { "temperature": "22", "moisture": "0.24" }
+          }
+        }
       }
     },
     {
@@ -147,9 +489,66 @@
       },
       "properties": {
         "area_ha": "1.56",
-        "name": "Field 7",
+        "name": "Wheat Field 1",
         "cropType": "Wheat",
-        "cropHealth": "Good"
+        "cropImage": "/wheat.png",
+        "cropHealth": "Good",
+        "cropHealthPercent": 79,
+        "sowingDate": "2025-11-01",
+        "standardYield": 460,
+        "avgNDVI": 0.72,
+        "evi": 0.6,
+        "savi": 0.69,
+        "vhi": 62.1,
+        "ndviSeries": [
+          { "name": "Day 1", "v": 0.68 },
+          { "name": "Day 2", "v": 0.69 },
+          { "name": "Day 3", "v": 0.71 },
+          { "name": "Day 4", "v": 0.73 },
+          { "name": "Day 5", "v": 0.74 },
+          { "name": "Day 6", "v": 0.73 },
+          { "name": "Day 7", "v": 0.72 }
+        ],
+        "waterSeries": [
+          { "name": "Day 1", "v": 0.25 },
+          { "name": "Day 2", "v": 0.26 },
+          { "name": "Day 3", "v": 0.26 },
+          { "name": "Day 4", "v": 0.27 },
+          { "name": "Day 5", "v": 0.28 },
+          { "name": "Day 6", "v": 0.27 },
+          { "name": "Day 7", "v": 0.26 }
+        ],
+        "soilHealth": {
+          "healthPercentage": 79,
+          "healthStatus": "Good",
+          "cropAge": 21,
+          "standardYield": 460,
+          "nutrients": [
+            {
+              "symbol": "N",
+              "label": "Nitrogen",
+              "thisYear": 62,
+              "lastYear": 70
+            },
+            {
+              "symbol": "P",
+              "label": "Phosphorus",
+              "thisYear": 28,
+              "lastYear": 32
+            },
+            {
+              "symbol": "K",
+              "label": "Potassium",
+              "thisYear": 165,
+              "lastYear": 175
+            }
+          ],
+          "layers": {
+            "surface": { "temperature": "22", "moisture": "0.26" },
+            "subsoil": { "temperature": "20", "moisture": "0.24" },
+            "parentMaterial": { "temperature": "18", "moisture": "0.22" }
+          }
+        }
       }
     },
     {
@@ -172,9 +571,66 @@
       },
       "properties": {
         "area_ha": "5.29",
-        "name": "Field 8",
+        "name": "Wheat Field 2",
         "cropType": "Wheat",
-        "cropHealth": "Poor"
+        "cropImage": "/wheat.png",
+        "cropHealth": "Poor",
+        "cropHealthPercent": 38,
+        "sowingDate": "2025-10-10",
+        "standardYield": 440,
+        "avgNDVI": 0.44,
+        "evi": 0.37,
+        "savi": 0.42,
+        "vhi": 37.2,
+        "ndviSeries": [
+          { "name": "Day 1", "v": 0.4 },
+          { "name": "Day 2", "v": 0.41 },
+          { "name": "Day 3", "v": 0.43 },
+          { "name": "Day 4", "v": 0.45 },
+          { "name": "Day 5", "v": 0.46 },
+          { "name": "Day 6", "v": 0.45 },
+          { "name": "Day 7", "v": 0.44 }
+        ],
+        "waterSeries": [
+          { "name": "Day 1", "v": 0.17 },
+          { "name": "Day 2", "v": 0.18 },
+          { "name": "Day 3", "v": 0.18 },
+          { "name": "Day 4", "v": 0.19 },
+          { "name": "Day 5", "v": 0.2 },
+          { "name": "Day 6", "v": 0.19 },
+          { "name": "Day 7", "v": 0.18 }
+        ],
+        "soilHealth": {
+          "healthPercentage": 38,
+          "healthStatus": "Needs Attention",
+          "cropAge": 51,
+          "standardYield": 440,
+          "nutrients": [
+            {
+              "symbol": "N",
+              "label": "Nitrogen",
+              "thisYear": 34,
+              "lastYear": 65
+            },
+            {
+              "symbol": "P",
+              "label": "Phosphorus",
+              "thisYear": 16,
+              "lastYear": 28
+            },
+            {
+              "symbol": "K",
+              "label": "Potassium",
+              "thisYear": 130,
+              "lastYear": 170
+            }
+          ],
+          "layers": {
+            "surface": { "temperature": "21", "moisture": "0.21" },
+            "subsoil": { "temperature": "19", "moisture": "0.19" },
+            "parentMaterial": { "temperature": "17", "moisture": "0.18" }
+          }
+        }
       }
     },
     {
@@ -193,9 +649,66 @@
       },
       "properties": {
         "area_ha": "1.98",
-        "name": "Field 9",
+        "name": "Mixed Crop Plot",
         "cropType": "Other",
-        "cropHealth": "Decent"
+        "cropImage": "/wheat.png",
+        "cropHealth": "Decent",
+        "cropHealthPercent": 58,
+        "sowingDate": "2025-09-18",
+        "standardYield": 3200,
+        "avgNDVI": 0.59,
+        "evi": 0.5,
+        "savi": 0.57,
+        "vhi": 54.0,
+        "ndviSeries": [
+          { "name": "Day 1", "v": 0.55 },
+          { "name": "Day 2", "v": 0.56 },
+          { "name": "Day 3", "v": 0.58 },
+          { "name": "Day 4", "v": 0.6 },
+          { "name": "Day 5", "v": 0.61 },
+          { "name": "Day 6", "v": 0.6 },
+          { "name": "Day 7", "v": 0.59 }
+        ],
+        "waterSeries": [
+          { "name": "Day 1", "v": 0.21 },
+          { "name": "Day 2", "v": 0.21 },
+          { "name": "Day 3", "v": 0.22 },
+          { "name": "Day 4", "v": 0.23 },
+          { "name": "Day 5", "v": 0.23 },
+          { "name": "Day 6", "v": 0.22 },
+          { "name": "Day 7", "v": 0.21 }
+        ],
+        "soilHealth": {
+          "healthPercentage": 58,
+          "healthStatus": "Normal",
+          "cropAge": 60,
+          "standardYield": 3200,
+          "nutrients": [
+            {
+              "symbol": "N",
+              "label": "Nitrogen",
+              "thisYear": 52,
+              "lastYear": 70
+            },
+            {
+              "symbol": "P",
+              "label": "Phosphorus",
+              "thisYear": 26,
+              "lastYear": 32
+            },
+            {
+              "symbol": "K",
+              "label": "Potassium",
+              "thisYear": 170,
+              "lastYear": 195
+            }
+          ],
+          "layers": {
+            "surface": { "temperature": "24", "moisture": "0.24" },
+            "subsoil": { "temperature": "22", "moisture": "0.22" },
+            "parentMaterial": { "temperature": "20", "moisture": "0.20" }
+          }
+        }
       }
     }
   ]

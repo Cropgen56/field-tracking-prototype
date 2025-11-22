@@ -1,5 +1,13 @@
+// src/components/NDVIChart.jsx
 import React from "react";
-import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, CartesianGrid } from "recharts";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  ResponsiveContainer,
+  CartesianGrid,
+} from "recharts";
 import { useFieldData } from "../context/FieldDataContext";
 
 const defaultData = [

@@ -1,5 +1,13 @@
+// src/components/WaterIndexChart.jsx
 import React from "react";
-import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, CartesianGrid } from "recharts";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  ResponsiveContainer,
+  CartesianGrid,
+} from "recharts";
 import { useFieldData } from "../context/FieldDataContext";
 
 const defaultData = [
@@ -10,7 +18,7 @@ const defaultData = [
   { name: "WK 5", v: 0.32 },
   { name: "WK 6", v: 0.38 },
   { name: "WK 7", v: 0.35 },
-  { name: "WK 8", v: 0.30 },
+  { name: "WK 8", v: 0.3 },
 ];
 
 export default function WaterIndexChart() {

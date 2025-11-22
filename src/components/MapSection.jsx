@@ -18,7 +18,7 @@ import MapOverlays from "./MapOverlays";
 import sampleFieldsData from "./sampleFields.json";
 import { useFieldData } from "../context/FieldDataContext";
 
-// ---------- Leaflet icon fix ----------
+// Fix for default marker icon
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl:
@@ -29,7 +29,7 @@ L.Icon.Default.mergeOptions({
     "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
 });
 
-// ---------- Custom yellow marker for manual points ----------
+// Custom yellow marker icon for manual boundary points
 const yellowMarkerIcon = new L.divIcon({
   className: "yellow-marker",
   html: `<div style="
@@ -50,7 +50,7 @@ const yellowMarkerIcon = new L.divIcon({
   iconAnchor: [12, 12],
 });
 
-// ---------- Helpers for crop-health styling ----------
+// crop-health color
 const getHealthColor = (health) => {
   const value = (health || "").toLowerCase();
   switch (value) {
@@ -80,23 +80,20 @@ const getSampleFieldStyle = (feature) => {
   };
 };
 
-// ---------- NEW: add IDs + better names to sampleFields ----------
+// add stable ids + nicer names
 const addIdsToSampleFields = (data) => {
   if (!data || !data.features) return data;
-
   return {
     ...data,
     features: data.features.map((feature, index) => {
       const props = feature.properties || {};
       const cropType = props.cropType || "Field";
       const displayName = props.name || `${cropType} Field ${index + 1}`;
-
       return {
         ...feature,
         properties: {
           ...props,
           name: displayName,
-          // stable id used by context & map dropdown
           _id: props._id || `sample-${index}`,
         },
       };
@@ -104,7 +101,6 @@ const addIdsToSampleFields = (data) => {
   };
 };
 
-// ---------- Map movement helper ----------
 const MoveMapToLocation = ({ center, bounds, onBoundsFitted }) => {
   const map = useMap();
   const previousBoundsRef = useRef(null);
@@ -112,8 +108,10 @@ const MoveMapToLocation = ({ center, bounds, onBoundsFitted }) => {
   useEffect(() => {
     if (bounds) {
       const boundsString = JSON.stringify(bounds);
+
       if (previousBoundsRef.current !== boundsString) {
         previousBoundsRef.current = boundsString;
+
         setTimeout(() => {
           try {
             map.fitBounds(bounds, {
@@ -122,11 +120,12 @@ const MoveMapToLocation = ({ center, bounds, onBoundsFitted }) => {
               animate: true,
               duration: 1,
             });
+
             if (onBoundsFitted) {
-              setTimeout(onBoundsFitted, 500);
+              setTimeout(() => onBoundsFitted(), 500);
             }
-          } catch (err) {
-            console.error("Error fitting bounds:", err);
+          } catch (error) {
+            console.error("Error fitting bounds:", error);
           }
         }, 100);
       }
@@ -137,8 +136,8 @@ const MoveMapToLocation = ({ center, bounds, onBoundsFitted }) => {
         setTimeout(() => {
           try {
             map.setView(center, 15, { animate: true });
-          } catch (err) {
-            console.error("Error setting view:", err);
+          } catch (error) {
+            console.error("Error setting view:", error);
           }
         }, 100);
       }
@@ -148,7 +147,7 @@ const MoveMapToLocation = ({ center, bounds, onBoundsFitted }) => {
   return null;
 };
 
-// ---------- Manual marker handler ----------
+// Manual boundary marker handler
 const ManualMarkerHandler = ({ isAdding, onAddMarker }) => {
   useMapEvents({
     click: (e) => {
@@ -177,7 +176,7 @@ export default function MapSection({
   const [showLocationModal, setShowLocationModal] = useState(false);
   const [mapKey, setMapKey] = useState(0);
 
-  // manual draw state
+  // Manual boundary mapping states
   const [manualMarkers, setManualMarkers] = useState([]);
   const [isAddingManual, setIsAddingManual] = useState(false);
   const [manualArea, setManualArea] = useState(0);
@@ -190,14 +189,17 @@ export default function MapSection({
 
   const {
     selectedCrop,
-    selectField, // for saved snapshot fields
-    selectedSampleFieldId, // id of current sample field
-    selectSampleField, // set sample field
+    loadSampleFields,
+    selectField,
+    selectedSampleFieldId,
+    selectSampleField,
   } = useFieldData();
 
-  const showToast = (message, type = "success") => setToast({ message, type });
+  const showToast = (message, type = "success") => {
+    setToast({ message, type });
+  };
 
-  // ------- handle saved snapshot selection -------
+  // Load snapshot when selected (manual saved field)
   useEffect(() => {
     if (
       selectedSnapshot &&
@@ -214,8 +216,10 @@ export default function MapSection({
       if (selectedSnapshot.markers.length > 0) {
         const lats = selectedSnapshot.markers.map((m) => m.lat);
         const lngs = selectedSnapshot.markers.map((m) => m.lng);
+
         const centerLat = (Math.min(...lats) + Math.max(...lats)) / 2;
         const centerLng = (Math.min(...lngs) + Math.max(...lngs)) / 2;
+
         setMapCenter([centerLat, centerLng]);
         setShouldFitBounds(true);
         setMapKey((prev) => prev + 1);
@@ -226,7 +230,6 @@ export default function MapSection({
     }
   }, [selectedSnapshot, selectField]);
 
-  // ------- external location (search) -------
   useEffect(() => {
     if (externalLocation) {
       setMapCenter(externalLocation);
@@ -234,9 +237,12 @@ export default function MapSection({
     }
   }, [externalLocation]);
 
-  // ------- uploaded geojson -------
   useEffect(() => {
-    if (uploadedData && uploadedData.coordinates?.length) {
+    if (
+      uploadedData &&
+      uploadedData.coordinates &&
+      uploadedData.coordinates.length > 0
+    ) {
       setGeneratedPolygon(uploadedData.coordinates);
       setShouldFitBounds(true);
       setSampleFields(null);
@@ -252,7 +258,7 @@ export default function MapSection({
     }
   }, [uploadedData]);
 
-  // ------- manual area + geojson -------
+  // Calculate area and GeoJSON for manual markers
   useEffect(() => {
     if (manualMarkers.length >= 3) {
       const coords = manualMarkers.map((m) => [m.lng, m.lat]);
@@ -281,22 +287,22 @@ export default function MapSection({
     }
   }, [manualMarkers]);
 
-  // ------- drawing cursor -------
   useEffect(() => {
     if (mapRef.current) {
-      mapRef.current.getContainer().style.cursor = isAddingManual
-        ? "crosshair"
-        : "";
+      const mapContainer = mapRef.current.getContainer();
+      mapContainer.style.cursor = isAddingManual ? "crosshair" : "";
     }
   }, [isAddingManual]);
 
-  // ------- Generate sample fields (with IDs + names) -------
+  // Generate sample fields and push into context
   const handleGenerateField = () => {
     setIsGenerating(true);
 
     setTimeout(() => {
       const enriched = addIdsToSampleFields(sampleFieldsData);
+
       setSampleFields(enriched);
+      loadSampleFields(enriched);
 
       const allCoords = [];
       enriched.features.forEach((feature) => {
@@ -312,6 +318,7 @@ export default function MapSection({
         const lngs = allCoords.map((c) => c.lng);
         const centerLat = (Math.min(...lats) + Math.max(...lats)) / 2;
         const centerLng = (Math.min(...lngs) + Math.max(...lngs)) / 2;
+
         setMapCenter([centerLat, centerLng]);
         setMapKey((prev) => prev + 1);
       }
@@ -321,8 +328,8 @@ export default function MapSection({
       setShouldFitBounds(true);
       setIsGenerating(false);
 
-      const totalArea = enriched.features.reduce((sum, f) => {
-        return sum + parseFloat(f.properties.area_ha || 0);
+      const totalArea = enriched.features.reduce((sum, feature) => {
+        return sum + parseFloat(feature.properties.area_ha || 0);
       }, 0);
 
       showToast(
@@ -334,12 +341,12 @@ export default function MapSection({
     }, 800);
   };
 
-  // ------- manual draw handlers -------
-  const handleAddManualMarker = (marker) =>
+  const handleAddManualMarker = (marker) => {
     setManualMarkers((prev) => [...prev, marker]);
+  };
 
   const handleUndoLastMarker = () => {
-    if (!manualMarkers.length) {
+    if (manualMarkers.length === 0) {
       showToast("No markers to undo", "warning");
       return;
     }
@@ -348,7 +355,7 @@ export default function MapSection({
   };
 
   const handleClearAllMarkers = () => {
-    if (!manualMarkers.length) {
+    if (manualMarkers.length === 0) {
       showToast("No markers to clear", "warning");
       return;
     }
@@ -379,7 +386,9 @@ export default function MapSection({
       localStorage.setItem("fieldSnapshots", JSON.stringify(updatedSnapshots));
       window.dispatchEvent(new Event("localStorageUpdated"));
 
-      if (onFieldSave) onFieldSave(boundaryData);
+      if (onFieldSave) {
+        onFieldSave(boundaryData);
+      }
 
       showToast(
         `Field saved! Area: ${manualArea.toFixed(2)} hectares`,
@@ -388,8 +397,8 @@ export default function MapSection({
 
       setManualMarkers([]);
       setIsAddingManual(false);
-    } catch (err) {
-      console.error("Error saving boundary:", err);
+    } catch (error) {
+      console.error("Error saving boundary:", error);
       showToast("Failed to save field. Please try again.", "error");
     }
   };
@@ -399,20 +408,27 @@ export default function MapSection({
       showToast("Please save or clear existing field first", "warning");
       return;
     }
-    setIsAddingManual((prev) => !prev);
-    showToast(
-      !isAddingManual
-        ? "Click on map to add boundary points"
-        : "Drawing mode stopped",
-      "success"
-    );
+    setIsAddingManual(!isAddingManual);
+    if (!isAddingManual) {
+      showToast("Click on map to add boundary points", "success");
+    } else {
+      showToast("Drawing mode stopped", "success");
+    }
   };
 
-  const handleZoomIn = () => mapRef.current && mapRef.current.zoomIn();
-  const handleZoomOut = () => mapRef.current && mapRef.current.zoomOut();
-  const handleBoundsFitted = () => setShouldFitBounds(false);
+  const handleZoomIn = () => {
+    if (mapRef.current) mapRef.current.zoomIn();
+  };
 
-  // ------- filter sample fields by crop + selected field -------
+  const handleZoomOut = () => {
+    if (mapRef.current) mapRef.current.zoomOut();
+  };
+
+  const handleBoundsFitted = () => {
+    setShouldFitBounds(false);
+  };
+
+  // Filter sample fields by crop + selected field
   const filteredSampleFields = useMemo(() => {
     if (!sampleFields) return null;
 
@@ -421,7 +437,7 @@ export default function MapSection({
     if (selectedCrop) {
       const target = selectedCrop.toLowerCase();
       features = features.filter(
-        (f) => (f?.properties?.cropType || "").toLowerCase() === target
+        (f) => (f.properties?.cropType || "").toLowerCase() === target
       );
     }
 
@@ -434,7 +450,7 @@ export default function MapSection({
     return { ...sampleFields, features };
   }, [sampleFields, selectedCrop, selectedSampleFieldId]);
 
-  // ------- options for field dropdown -------
+  // Options for field dropdown (map top-left)
   const fieldOptions = useMemo(() => {
     if (!sampleFields) return [];
     let features = sampleFields.features;
@@ -442,7 +458,7 @@ export default function MapSection({
     if (selectedCrop) {
       const target = selectedCrop.toLowerCase();
       features = features.filter(
-        (f) => (f?.properties?.cropType || "").toLowerCase() === target
+        (f) => (f.properties?.cropType || "").toLowerCase() === target
       );
     }
 
@@ -467,7 +483,7 @@ export default function MapSection({
         }
       });
 
-      if (allCoords.length) {
+      if (allCoords.length > 0) {
         const lats = allCoords.map((c) => c.lat);
         const lngs = allCoords.map((c) => c.lng);
         return [
@@ -477,10 +493,11 @@ export default function MapSection({
       }
     }
 
-    if (!generatedPolygon.length && !manualMarkers.length) return null;
+    if (generatedPolygon.length === 0 && manualMarkers.length === 0)
+      return null;
 
     let lats, lngs;
-    if (manualMarkers.length) {
+    if (manualMarkers.length > 0) {
       lats = manualMarkers.map((c) => c.lat);
       lngs = manualMarkers.map((c) => c.lng);
     } else {
@@ -511,8 +528,7 @@ export default function MapSection({
             maxZoom={20}
           />
 
-          {/* Uploaded GeoJSON */}
-          {uploadedData?.geojson && (
+          {uploadedData && uploadedData.geojson && (
             <GeoJSON
               key={uploadedData.fileName}
               data={uploadedData.geojson}
@@ -525,7 +541,6 @@ export default function MapSection({
             />
           )}
 
-          {/* Sample fields */}
           {filteredSampleFields?.features && (
             <GeoJSON
               key={`sample-fields-${selectedCrop || "all"}-${
@@ -534,7 +549,7 @@ export default function MapSection({
               data={filteredSampleFields}
               style={getSampleFieldStyle}
               onEachFeature={(feature, layer) => {
-                if (feature.properties?.name) {
+                if (feature.properties && feature.properties.name) {
                   const { name, area_ha, cropType, cropHealth } =
                     feature.properties;
                   layer.bindPopup(`
@@ -550,10 +565,9 @@ export default function MapSection({
             />
           )}
 
-          {/* Generated polygon when no sample/manual */}
           {generatedPolygon.length > 0 &&
             !uploadedData?.geojson &&
-            !manualMarkers.length &&
+            manualMarkers.length === 0 &&
             !sampleFields && (
               <Polygon
                 positions={generatedPolygon.map(({ lat, lng }) => [lat, lng])}
@@ -566,7 +580,6 @@ export default function MapSection({
               />
             )}
 
-          {/* Manual markers + polygon */}
           {manualMarkers.map((marker, i) => (
             <Marker
               key={i}
@@ -600,7 +613,6 @@ export default function MapSection({
           />
         </MapContainer>
 
-        {/* Controls */}
         <MapControls
           isAddingManual={isAddingManual}
           isGenerating={isGenerating}
