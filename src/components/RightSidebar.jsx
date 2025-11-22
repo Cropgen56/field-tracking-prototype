@@ -33,7 +33,7 @@ export default function RightSidebar({ onFileUpload, onSnapshotClick }) {
     clearField,
   } = useFieldData();
 
-  // ------- load snapshots -------
+  // -------- load snapshots from localStorage --------
   useEffect(() => {
     const loadSnapshots = () => {
       try {
@@ -71,7 +71,7 @@ export default function RightSidebar({ onFileUpload, onSnapshotClick }) {
     };
   }, [clearField]);
 
-  // ------- file upload -------
+  // -------- file upload --------
   const handleFileUpload = async (event) => {
     const files = event.target.files;
     if (!files || files.length === 0) return;
@@ -124,7 +124,7 @@ export default function RightSidebar({ onFileUpload, onSnapshotClick }) {
     }
   };
 
-  // ------- manual snapshot click / delete -------
+  // -------- manual snapshot click / delete --------
   const handleSnapshotClickLocal = (snapshot) => {
     setSelectedFieldId(snapshot.id);
     selectField(snapshot);
@@ -175,7 +175,7 @@ export default function RightSidebar({ onFileUpload, onSnapshotClick }) {
     }
   };
 
-  // ------- header / metrics -------
+  // -------- header / metrics --------
   const headerTitle =
     fieldData?.selectionLabel ||
     (selectedField ? selectedField.name : "Field Name");
@@ -205,7 +205,7 @@ export default function RightSidebar({ onFileUpload, onSnapshotClick }) {
           <div className="text-xs text-[#9FB79F] -mt-1">{headerSubtitle}</div>
         </div>
 
-        {/* Suggested Crop filter (same style as map dropdown) */}
+        {/* Suggested Crop filter */}
         <div className="mt-3 sm:mt-4">
           <label className="text-xs text-[#9FB79F]">Suggested Crop</label>
           <select
@@ -256,31 +256,36 @@ export default function RightSidebar({ onFileUpload, onSnapshotClick }) {
           />
         </div>
 
-        <div className="border-t border-white/10 my-4 sm:my-6"></div>
+        {/* 1) Hide vegetation & water charts until fieldData exists */}
+        {fieldData && (
+          <>
+            <div className="border-t border-white/10 my-4 sm:my-6"></div>
 
-        {/* Vegetation Time-Series */}
-        <div>
-          <div className="text-xs sm:text-sm font-semibold text-white">
-            Vegetation Time-Series (8 Weeks)
-          </div>
-          <div className="mt-3 sm:mt-4 h-32 sm:h-40">
-            <NDVIChart />
-          </div>
-        </div>
+            {/* Vegetation Time-Series */}
+            <div>
+              <div className="text-xs sm:text-sm font-semibold text-white">
+                Vegetation Time-Series (8 Weeks)
+              </div>
+              <div className="mt-3 sm:mt-4 h-32 sm:h-40">
+                <NDVIChart />
+              </div>
+            </div>
 
-        <div className="border-t border-white/10 my-4 sm:my-6"></div>
+            <div className="border-t border-white/10 my-4 sm:my-6"></div>
 
-        {/* Water Index Time-Series */}
-        <div>
-          <div className="text-xs sm:text-sm font-semibold text-white">
-            Water Index Time-Series (8 Weeks)
-          </div>
-          <div className="mt-3 sm:mt-4 h-32 sm:h-40">
-            <WaterIndexChart />
-          </div>
-        </div>
+            {/* Water Index Time-Series */}
+            <div>
+              <div className="text-xs sm:text-sm font-semibold text-white">
+                Water Index Time-Series (8 Weeks)
+              </div>
+              <div className="mt-3 sm:mt-4 h-32 sm:h-40">
+                <WaterIndexChart />
+              </div>
+            </div>
 
-        <div className="border-t border-white/10 my-4 sm:my-6"></div>
+            <div className="border-t border-white/10 my-4 sm:my-6"></div>
+          </>
+        )}
 
         {/* Saved manual fields */}
         {snapshots.length > 0 ? (

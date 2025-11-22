@@ -1,6 +1,6 @@
 // src/components/SoilHealth.jsx
 import React, { useState } from "react";
-import wheatCrop from "../assets/cropimage.png";
+import wheatCrop from "../assets/wheat.png"; // default + wheat image
 import SoilHealthChart from "./crophealth/SoilHealthChart";
 import { useFieldData } from "../context/FieldDataContext";
 
@@ -21,6 +21,7 @@ export default function SoilHealth() {
     standardYield: 460,
   };
 
+  // major crop from context (for groups or single field)
   const majorCrop = autoDetectCrop ? fieldData?.majorCrop || "Wheat" : "Wheat";
 
   const totalArea = fieldData?.totalArea || 1.5;
@@ -28,6 +29,25 @@ export default function SoilHealth() {
   const maxNutrientValue = Math.max(
     ...soilNutrients.flatMap((n) => [n.thisYear, n.lastYear])
   );
+
+  // ---------------------- crop image selection ---------------------- //
+  // 1) Prefer image coming from fieldData (aggregated/group image)
+  // 2) Otherwise choose based on majorCrop name
+  const cropImageFromFieldData = fieldData?.cropImage; // e.g. "/maize.jpg" from JSON
+
+  const cropImageSrc = (() => {
+    if (cropImageFromFieldData) return cropImageFromFieldData;
+
+    const crop = (majorCrop || "").toLowerCase();
+
+    if (crop === "maize") return "/maize.jpg";
+    if (crop === "tobacco") return "/tobacco.jpg";
+    if (crop === "other") return "/mixed.jpg"; // optional, if you have it
+
+    // default & wheat
+    return wheatCrop;
+  })();
+  // ------------------------------------------------------------------ //
 
   return (
     <div className="bg-[#0C2214] rounded-xl p-4 sm:p-5 md:px-8 md:py-5 text-white">
@@ -59,8 +79,8 @@ export default function SoilHealth() {
 
       <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 mb-4 sm:mb-6">
         <img
-          src={wheatCrop}
-          alt="Crop"
+          src={cropImageSrc}
+          alt={majorCrop || "Crop"}
           className="w-full sm:w-[140px] md:w-[160px] h-[120px] sm:h-[140px] md:h-[160px] rounded-lg object-cover border border-white/10"
         />
 
@@ -89,7 +109,7 @@ export default function SoilHealth() {
                 {soilHealthData.healthPercentage}%
               </span>
               <span className="text-[10px] text-gray-400 hidden sm:inline">
-                Based on vegetation & soil indices
+                Based on vegetation &amp; soil indices
               </span>
             </div>
             <span
@@ -104,6 +124,7 @@ export default function SoilHealth() {
               {soilHealthData.healthStatus}
             </span>
           </div>
+
           <div className="w-full h-1.5 bg-white rounded-full overflow-hidden">
             <div
               className={`h-full rounded-full ${

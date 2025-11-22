@@ -1,4 +1,3 @@
-// src/components/DashboardCards.jsx
 import React from "react";
 import ndviIcon from "../assets/ndvi-graph.png";
 import areaIcon from "../assets/area.png";
@@ -9,14 +8,10 @@ import { useFieldData } from "../context/FieldDataContext";
 export default function DashboardCards() {
   const { fieldData } = useFieldData();
 
-  const defaultData = {
-    avgNDVI: { value: "0.68", change: "+5.2", positive: true },
-    totalArea: 1247,
-    healthyFarms: { healthy: 23, total: 28 },
-    lowIndexFarms: 5,
-  };
+  // 1) When nothing is active on the map -> hide all four cards
+  if (!fieldData || !fieldData.dashboardData) return null;
 
-  const data = fieldData?.dashboardData || defaultData;
+  const data = fieldData.dashboardData;
 
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-4 w-full">
@@ -56,7 +51,7 @@ export default function DashboardCards() {
           </p>
           <div className="flex-col">
             <p className="text-white text-base sm:text-lg md:text-xl font-semibold leading-none">
-              {fieldData ? data.totalArea.toFixed(2) : data.totalArea}
+              {data.totalArea.toFixed(2)}
             </p>
             <span className="text-green-400 text-[10px] sm:text-[11px] md:text-[12px] leading-none">
               Hectares
@@ -93,7 +88,7 @@ export default function DashboardCards() {
       </div>
 
       {/* Low Index Farms */}
-      <div className="bg-[#0C2214] rounded-xl sm:rounded-2xl p-3 sm:pm-4 md:px-6 md:py-6 shadow-xl flex items-center justify-between">
+      <div className="bg-[#0C2214] rounded-xl sm:rounded-2xl p-3 sm:p-4 md:px-6 md:py-6 shadow-xl flex items-center justify-between">
         <div className="flex flex-col justify-evenly h-full">
           <p className="text-gray-400 text-xs sm:text-sm md:text-[16px] font-medium mb-2 sm:mb-3">
             Low Index Farms
