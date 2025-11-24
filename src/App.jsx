@@ -4,6 +4,7 @@ import MapSection from "./components/MapSection";
 import RightSidebar from "./components/RightSidebar";
 import DashboardCards from "./components/DashboardCards";
 import SoilHealth from "./components/SoilHealth";
+import TimeSeriesCharts from "./components/TimeSeriesCharts";
 import SearchBar from "./components/SearchBar";
 import { FieldDataProvider } from "./context/FieldDataContext";
 
@@ -11,8 +12,6 @@ export default function App() {
   const [uploadedFileData, setUploadedFileData] = useState(null);
   const [mapLocation, setMapLocation] = useState(null);
   const [selectedSnapshot, setSelectedSnapshot] = useState(null);
-  // 👇 global crop filter ("farm type" selection)
-  const [selectedCrop, setSelectedCrop] = useState(""); // '' = all crops
 
   const handleFileUpload = (fileData) => {
     console.log("App received file upload:", fileData);
@@ -44,38 +43,41 @@ export default function App() {
 
         <div className="w-full max-w-[2000px] mx-auto px-3 sm:px-4 md:px-6 py-3 sm:py-4 md:py-6 pb-8 sm:pb-12 md:pb-16">
           {/* Desktop Layout */}
-          <div className="hidden lg:grid lg:grid-cols-12 gap-3 sm:gap-4 md:gap-6">
-            {/* Main Content */}
-            <div className="col-span-8 xl:col-span-8 2xl:col-span-9">
-              <div className="mb-3 sm:mb-4">
-                <SearchBar onLocationSelect={handleLocationChange} />
+          <div className="hidden lg:block">
+            {/* Grid Section - Map + Dashboard + Sidebar */}
+            <div className="grid lg:grid-cols-12 gap-3 sm:gap-4 md:gap-6">
+              {/* Main Content */}
+              <div className="col-span-8 xl:col-span-8 2xl:col-span-9">
+                <div className="mb-3 sm:mb-4">
+                  <SearchBar onLocationSelect={handleLocationChange} />
+                </div>
+
+                <MapSection
+                  uploadedData={uploadedFileData}
+                  externalLocation={mapLocation}
+                  onLocationChange={handleLocationChange}
+                  onFieldSave={handleFieldSave}
+                  selectedSnapshot={selectedSnapshot}
+                />
+
+                <div className="mt-3 sm:mt-4 md:mt-6">
+                  <DashboardCards />
+                </div>
               </div>
 
-              <MapSection
-                uploadedData={uploadedFileData}
-                externalLocation={mapLocation}
-                onLocationChange={handleLocationChange}
-                onFieldSave={handleFieldSave}
-                selectedSnapshot={selectedSnapshot}
-                selectedCrop={selectedCrop}
-              />
-
-              <div className="mt-3 sm:mt-4 md:mt-6">
-                <DashboardCards />
-              </div>
-              <div className="mt-3 sm:mt-4 md:mt-6">
-                <SoilHealth />
+              {/* Sidebar */}
+              <div className="col-span-4 xl:col-span-4 2xl:col-span-3">
+                <RightSidebar
+                  onFileUpload={handleFileUpload}
+                  onSnapshotClick={handleSnapshotClick}
+                />
               </div>
             </div>
 
-            {/* Sidebar */}
-            <div className="col-span-4 xl:col-span-4 2xl:col-span-3">
-              <RightSidebar
-                onFileUpload={handleFileUpload}
-                onSnapshotClick={handleSnapshotClick}
-                selectedCrop={selectedCrop}
-                onCropChange={setSelectedCrop}
-              />
+            {/* Full-Width Section - Soil Health + Charts */}
+            <div className="mt-3 sm:mt-4 md:mt-6 space-y-3 sm:space-y-4 md:space-y-6">
+              <SoilHealth />
+              <TimeSeriesCharts />
             </div>
           </div>
 
@@ -89,17 +91,15 @@ export default function App() {
               onLocationChange={handleLocationChange}
               onFieldSave={handleFieldSave}
               selectedSnapshot={selectedSnapshot}
-              selectedCrop={selectedCrop}
             />
 
             <DashboardCards />
             <SoilHealth />
+            <TimeSeriesCharts />
 
             <RightSidebar
               onFileUpload={handleFileUpload}
               onSnapshotClick={handleSnapshotClick}
-              selectedCrop={selectedCrop}
-              onCropChange={setSelectedCrop}
             />
           </div>
         </div>

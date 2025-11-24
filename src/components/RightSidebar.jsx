@@ -6,8 +6,6 @@ import {
   MapPin,
   Trash2,
 } from "lucide-react";
-import NDVIChart from "./NDVIChart";
-import WaterIndexChart from "./WaterIndexChart";
 import {
   processUploadedFile,
   extractCoordinatesFromGeoJSON,
@@ -186,9 +184,9 @@ export default function RightSidebar({ onFileUpload, onSnapshotClick }) {
       : "No Field Selected");
 
   const metrics = fieldData?.sidebarMetrics || {
-    evi: { value: "0.65", change: "+5.2", positive: true },
-    vhi: { value: "48.1", change: "-5.2", positive: false },
-    savi: { value: "0.71", change: "+5.2", positive: true },
+    evi: { value: "0.00", change: "0.0", positive: true },
+    vhi: { value: "0.0", change: "0.0", positive: false },
+    savi: { value: "0.00", change: "0.0", positive: true },
   };
 
   const totalArea =
@@ -212,6 +210,7 @@ export default function RightSidebar({ onFileUpload, onSnapshotClick }) {
             value={selectedCrop || ""}
             onChange={(e) => setSelectedCrop(e.target.value)}
             className="w-full mt-1 bg-cg-panel/95 text-white rounded-lg px-3 py-2 text-xs sm:text-sm border border-green-500/20 hover:border-green-500/40 focus:outline-none cursor-pointer"
+            disabled={availableCrops.length === 0}
           >
             <option value="">All crops</option>
             {availableCrops.map((crop) => (
@@ -256,40 +255,9 @@ export default function RightSidebar({ onFileUpload, onSnapshotClick }) {
           />
         </div>
 
-        {/* 1) Hide vegetation & water charts until fieldData exists */}
-        {fieldData && (
-          <>
-            <div className="border-t border-white/10 my-4 sm:my-6"></div>
-
-            {/* Vegetation Time-Series */}
-            <div>
-              <div className="text-xs sm:text-sm font-semibold text-white">
-                Vegetation Time-Series (8 Weeks)
-              </div>
-              <div className="mt-3 sm:mt-4 h-32 sm:h-40">
-                <NDVIChart />
-              </div>
-            </div>
-
-            <div className="border-t border-white/10 my-4 sm:my-6"></div>
-
-            {/* Water Index Time-Series */}
-            <div>
-              <div className="text-xs sm:text-sm font-semibold text-white">
-                Water Index Time-Series (8 Weeks)
-              </div>
-              <div className="mt-3 sm:mt-4 h-32 sm:h-40">
-                <WaterIndexChart />
-              </div>
-            </div>
-
-            <div className="border-t border-white/10 my-4 sm:my-6"></div>
-          </>
-        )}
-
-        {/* Saved manual fields */}
         {snapshots.length > 0 ? (
           <>
+            <div className="border-t border-white/10 my-4 sm:my-6"></div>
             <div>
               <div className="flex items-center justify-between mb-3">
                 <div className="text-xs sm:text-sm font-semibold text-white">
@@ -339,11 +307,10 @@ export default function RightSidebar({ onFileUpload, onSnapshotClick }) {
                 ))}
               </div>
             </div>
-
-            <div className="border-t border-white/10 my-4 sm:my-6"></div>
           </>
         ) : (
           <>
+            <div className="border-t border-white/10 my-4 sm:my-6"></div>
             <div className="text-center py-8">
               <div className="text-gray-400 text-sm mb-2">
                 No saved fields yet
@@ -352,9 +319,10 @@ export default function RightSidebar({ onFileUpload, onSnapshotClick }) {
                 Draw a field on the map and save it to see it here
               </div>
             </div>
-            <div className="border-t border-white/10 my-4 sm:my-6"></div>
           </>
         )}
+
+        <div className="border-t border-white/10 my-4 sm:my-6"></div>
 
         {/* Upload field boundaries */}
         <div className="text-center">

@@ -1,11 +1,9 @@
-// src/context/FieldDataContext.jsx
 import React, { createContext, useContext, useState, useMemo } from "react";
 
 const FieldDataContext = createContext(null);
 
 export const useFieldData = () => useContext(FieldDataContext);
 
-// ------- helpers -------
 const toNum = (v) => (v == null || v === "" ? 0 : Number(v));
 const mean = (arr) =>
   !arr || !arr.length ? 0 : arr.reduce((a, b) => a + b, 0) / arr.length;
@@ -31,24 +29,52 @@ function buildFieldData(features, selectedCrop, selectedSampleFieldId) {
     return health === "poor" || toNum(f.properties?.vhi) < 45;
   }).length;
 
-  // ---- time series (NDVI / Water) ----
-  const firstNdvi = features[0].properties?.ndviSeries || [];
-  const ndviTimeSeries = firstNdvi.map((point, idx) => {
-    const v = mean(
-      features.map((f) => f.properties?.ndviSeries?.[idx]?.v ?? point.v ?? 0)
-    );
-    return { name: point.name, v: Number(v.toFixed(2)) };
-  });
+  // Process 15-day interval time series data with 2024/2025 comparison
+  const firstFeature = features[0];
+  const firstNdvi = firstFeature.properties?.ndviSeries || [];
+  const firstWater = firstFeature.properties?.waterSeries || [];
 
-  const firstWater = features[0].properties?.waterSeries || [];
-  const waterIndexTimeSeries = firstWater.map((point, idx) => {
-    const v = mean(
-      features.map((f) => f.properties?.waterSeries?.[idx]?.v ?? point.v ?? 0)
-    );
-    return { name: point.name, v: Number(v.toFixed(2)) };
-  });
+  // For single field - use data directly
+  if (count === 1) {
+    var ndviTimeSeries = firstNdvi;
+    var waterIndexTimeSeries = firstWater;
+  } else {
+    // For multiple fields - average the data
+    ndviTimeSeries = firstNdvi.map((point, idx) => {
+      const values2025 = features.map((f) => {
+        const series = f.properties?.ndviSeries || [];
+        return series[idx]?.["2025"] || 0;
+      });
+      const values2024 = features.map((f) => {
+        const series = f.properties?.ndviSeries || [];
+        return series[idx]?.["2024"] || 0;
+      });
 
-  // ---- soil nutrients ----
+      return {
+        date: point.date,
+        "2025": Number(mean(values2025).toFixed(2)),
+        "2024": Number(mean(values2024).toFixed(2)),
+      };
+    });
+
+    waterIndexTimeSeries = firstWater.map((point, idx) => {
+      const values2025 = features.map((f) => {
+        const series = f.properties?.waterSeries || [];
+        return series[idx]?.["2025"] || 0;
+      });
+      const values2024 = features.map((f) => {
+        const series = f.properties?.waterSeries || [];
+        return series[idx]?.["2024"] || 0;
+      });
+
+      return {
+        date: point.date,
+        "2025": Number(mean(values2025).toFixed(3)),
+        "2024": Number(mean(values2024).toFixed(3)),
+      };
+    });
+  }
+
   const firstSoil = features[0].properties?.soilHealth || {};
   const nutrients = (firstSoil.nutrients || []).map((nut, idx) => {
     const thisYearVals = features.map(
@@ -71,7 +97,6 @@ function buildFieldData(features, selectedCrop, selectedSampleFieldId) {
     };
   });
 
-  // ---- soil layers (surface, subsoil, parentMaterial) ----
   const layerKeys = ["surface", "subsoil", "parentMaterial"];
   const layers = layerKeys.reduce((acc, key) => {
     const template = firstSoil.layers?.[key] || {
@@ -106,6 +131,8 @@ function buildFieldData(features, selectedCrop, selectedSampleFieldId) {
   else if (healthPerc < 45) healthStatus = "Needs Attention";
 
   const cropAges = features.map((f) => f.properties?.soilHealth?.cropAge ?? 0);
+
+  // Calculate standard yields (average across all features)
   const standardYields = features.map(
     (f) =>
       f.properties?.standardYield ??
@@ -113,19 +140,26 @@ function buildFieldData(features, selectedCrop, selectedSampleFieldId) {
       0
   );
 
+  // Calculate AI yields (average across all features)
+  const aiYields = features.map(
+    (f) => f.properties?.aiYield ?? f.properties?.soilHealth?.aiYield ?? 0
+  );
+
   const soilHealth = {
     healthPercentage: Number(healthPerc.toFixed(0)),
     healthStatus,
     cropAge: Number(mean(cropAges).toFixed(0)),
     standardYield: Number(mean(standardYields).toFixed(0)),
+    aiYield: Number(mean(aiYields).toFixed(0)),
     nutrients,
     layers,
   };
 
   const ndviChange =
-    ndviTimeSeries.length > 1 && ndviTimeSeries[0].v !== 0
-      ? ((ndviTimeSeries[ndviTimeSeries.length - 1].v - ndviTimeSeries[0].v) /
-          ndviTimeSeries[0].v) *
+    ndviTimeSeries.length > 1 && ndviTimeSeries[0]["2025"] !== 0
+      ? ((ndviTimeSeries[ndviTimeSeries.length - 1]["2025"] -
+          ndviTimeSeries[0]["2025"]) /
+          ndviTimeSeries[0]["2025"]) *
         100
       : 0;
 
@@ -170,13 +204,25 @@ function buildFieldData(features, selectedCrop, selectedSampleFieldId) {
       return Object.entries(areaByCrop).sort((a, b) => b[1] - a[1])[0][0];
     })();
 
+  const cropImage = (() => {
+    if (count === 1) {
+      return features[0].properties?.cropImage || null;
+    }
+    const majorCropFeature = features.find(
+      (f) =>
+        (f.properties?.cropType || "").toLowerCase() ===
+        majorCrop.toLowerCase()
+    );
+    return majorCropFeature?.properties?.cropImage || null;
+  })();
+
   let selectionLabel;
   if (count === 1) {
     selectionLabel = features[0].properties?.name || "Selected field";
   } else if (selectedCrop) {
     selectionLabel = `${selectedCrop} Fields (${count})`;
   } else {
-    selectionLabel = `All Fields (${count})`;
+    selectionLabel = `${majorCrop} Fields (${count})`;
   }
   const selectionSubtitle = `${totalArea.toFixed(2)} ha • ${count} field${
     count > 1 ? "s" : ""
@@ -188,6 +234,7 @@ function buildFieldData(features, selectedCrop, selectedSampleFieldId) {
     selectionLabel,
     selectionSubtitle,
     majorCrop,
+    cropImage,
     dashboardData,
     sidebarMetrics,
     ndviTimeSeries,
@@ -198,10 +245,8 @@ function buildFieldData(features, selectedCrop, selectedSampleFieldId) {
 
 export function FieldDataProvider({ children }) {
   const [sampleFields, setSampleFields] = useState(null);
-  const [selectedCrop, setSelectedCrop] = useState(""); // '' = all crops
+  const [selectedCrop, setSelectedCrop] = useState("");
   const [selectedSampleFieldId, setSelectedSampleFieldId] = useState(null);
-
-  // manual snapshots (localStorage fields) – still supported
   const [selectedSnapshotField, setSelectedSnapshotField] = useState(null);
 
   const fieldData = useMemo(() => {
@@ -209,16 +254,37 @@ export function FieldDataProvider({ children }) {
 
     let features = sampleFields.features;
 
-    if (selectedCrop) {
+    // Priority 1: If a specific field is selected, use only that field
+    if (selectedSampleFieldId) {
+      features = features.filter(
+        (f) => f.properties?._id === selectedSampleFieldId
+      );
+    }
+    // Priority 2: If a crop is manually selected, filter by that crop
+    else if (selectedCrop) {
       const target = selectedCrop.toLowerCase();
       features = features.filter(
         (f) => (f.properties?.cropType || "").toLowerCase() === target
       );
     }
+    // Priority 3: Auto-select major crop
+    else {
+      // Calculate area by crop type
+      const areaByCrop = {};
+      features.forEach((f) => {
+        const crop = f.properties?.cropType || "Unknown";
+        const area = toNum(f.properties?.area_ha);
+        areaByCrop[crop] = (areaByCrop[crop] || 0) + area;
+      });
 
-    if (selectedSampleFieldId) {
+      // Find the crop with the largest total area
+      const majorCrop = Object.entries(areaByCrop).sort(
+        (a, b) => b[1] - a[1]
+      )[0][0];
+
+      // Filter to show only fields of the major crop
       features = features.filter(
-        (f) => f.properties?._id === selectedSampleFieldId
+        (f) => (f.properties?.cropType || "Unknown") === majorCrop
       );
     }
 

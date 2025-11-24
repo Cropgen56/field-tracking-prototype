@@ -1,6 +1,6 @@
 // src/components/SoilHealth.jsx
 import React, { useState } from "react";
-import wheatCrop from "../assets/wheat.png"; // default + wheat image
+import wheatCrop from "../assets/wheat.png";
 import SoilHealthChart from "./crophealth/SoilHealthChart";
 import { useFieldData } from "../context/FieldDataContext";
 
@@ -8,49 +8,44 @@ export default function SoilHealth() {
   const [autoDetectCrop, setAutoDetectCrop] = useState(true);
   const { fieldData } = useFieldData();
 
-  const soilNutrients = fieldData?.soilHealth?.nutrients || [
-    { symbol: "P", label: "Nitrogen", thisYear: 25.4, lastYear: 20.6 },
-    { symbol: "Mg", label: "Phosphorous", thisYear: 8.1, lastYear: 7.5 },
-    { symbol: "K", label: "Potassium", thisYear: 10.4, lastYear: 8.1 },
-  ];
+  if (!fieldData) return null;
 
-  const soilHealthData = fieldData?.soilHealth || {
+  const soilNutrients = fieldData.soilHealth?.nutrients || [];
+  const soilHealthData = fieldData.soilHealth || {
     healthPercentage: 60,
     healthStatus: "Normal",
     cropAge: 15,
     standardYield: 460,
+    aiYield: 495,
   };
 
-  // major crop from context (for groups or single field)
-  const majorCrop = autoDetectCrop ? fieldData?.majorCrop || "Wheat" : "Wheat";
-
-  const totalArea = fieldData?.totalArea || 1.5;
+  const majorCrop = autoDetectCrop ? fieldData.majorCrop || "Wheat" : "Wheat";
+  const totalArea = fieldData.totalArea || 0;
 
   const maxNutrientValue = Math.max(
-    ...soilNutrients.flatMap((n) => [n.thisYear, n.lastYear])
+    ...soilNutrients.flatMap((n) => [n.thisYear, n.lastYear]),
+    1
   );
 
-  // ---------------------- crop image selection ---------------------- //
-  // 1) Prefer image coming from fieldData (aggregated/group image)
-  // 2) Otherwise choose based on majorCrop name
-  const cropImageFromFieldData = fieldData?.cropImage; // e.g. "/maize.jpg" from JSON
-
   const cropImageSrc = (() => {
-    if (cropImageFromFieldData) return cropImageFromFieldData;
+    if (fieldData.cropImage) return fieldData.cropImage;
 
     const crop = (majorCrop || "").toLowerCase();
-
     if (crop === "maize") return "/maize.jpg";
     if (crop === "tobacco") return "/tobacco.jpg";
-    if (crop === "other") return "/mixed.jpg"; // optional, if you have it
+    if (crop === "other") return "/mixed.jpg";
 
-    // default & wheat
     return wheatCrop;
   })();
-  // ------------------------------------------------------------------ //
+
+  // Calculate yield difference
+  const yieldDifference = soilHealthData.aiYield - soilHealthData.standardYield;
+  const yieldDifferencePercent = soilHealthData.standardYield > 0
+    ? ((yieldDifference / soilHealthData.standardYield) * 100).toFixed(1)
+    : 0;
 
   return (
-    <div className="bg-[#0C2214] rounded-xl p-4 sm:p-5 md:px-8 md:py-5 text-white">
+    <div className="bg-[#0C2214] rounded-xl p-4 sm:p-5 md:px-8 md:py-5 text-white max-w-full">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 sm:mb-5">
         <h1 className="text-lg sm:text-xl font-bold">Crop Health</h1>
         <div className="flex items-center gap-2">
@@ -95,11 +90,34 @@ export default function SoilHealth() {
                 Overall Crop Health
               </p>
             </div>
-            <div className="text-xs sm:text-sm">
+            <div className="text-xs sm:text-sm space-y-1">
               <p>Crop Age :- {soilHealthData.cropAge} days</p>
-              <p className="mt-1 sm:mt-2">
-                Standard Yield Data :- {soilHealthData.standardYield} kg/hectare
-              </p>
+              
+              {/* Standard Yield */}
+              <div className="flex items-baseline gap-2">
+                <span className="text-gray-400">Standard Yield:-</span>
+                <span className="font-semibold">
+                  {soilHealthData.standardYield} Quintals
+                </span>
+              </div>
+              
+              {/* AI Yield */}
+              <div className="flex items-baseline gap-2">
+                <span className="text-gray-400">AI Predicted Yield:-</span>
+                <span className="font-semibold text-green-400">
+                  {soilHealthData.aiYield} Quintals
+                </span>
+                <span
+                  className={`text-[10px] px-1.5 py-0.5 rounded ${
+                    yieldDifference >= 0
+                      ? "bg-green-500/20 text-green-400"
+                      : "bg-red-500/20 text-red-400"
+                  }`}
+                >
+                  {yieldDifference >= 0 ? "+" : ""}
+                  {yieldDifferencePercent}%
+                </span>
+              </div>
             </div>
           </div>
 
